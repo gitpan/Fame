@@ -125,7 +125,7 @@ will return an array containing the values of "ibm" from 1jun95 to
 of a reference.  The dates must be in a format consistent with the
 frequency of the object ("ibm"), which in this case is daily.
 
-Likewise, to write values to the database , assign the hash to an
+Likewise, to write values to the database, assign the hash to an
 array reference.  For example
 
    $db{"ibm:1jun95"} = [1,4,6];
@@ -432,7 +432,7 @@ Reserve Board, Washington, DC.
 
 =item 3.
 
-Everything except the Fame::HLI component is Copyright 1995 by
+Everything except the Fame::HLI component is Copyright 1995-1997 by
 Fernando Trias.  Parts of the Fame::HLI component are also Copyright
 1995 by Fernando Trias.  These are marked as such.
 

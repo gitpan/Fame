@@ -5,12 +5,13 @@
 
 package Fame::HLI;
 
+use strict;
 use Carp;
 use Exporter;
 use DynaLoader;
-@ISA = (Exporter, DynaLoader);
+@Fame::HLI::ISA = qw(Exporter, DynaLoader);
 
-@EXPORT = 
+@Fame::HLI::EXPORT = 
 qw( cfmgatt cfmsatt famestart famestop fameopen fameclose fameread
 famereadn famewrite famegetinfo cfmalob cfmbwdy cfmchfr cfmcldb
 cfmcpob cfmdatd cfmdatf cfmdati cfmdatl cfmdatp cfmdatt cfmddat
@@ -24,31 +25,35 @@ cfmrdfm cfmrdnl cfmrmev cfmrnob cfmrrng cfmrsdb cfmrstr cfmsali
 cfmsaso cfmsbas cfmsbm cfmsdes cfmsdm cfmsdoc cfmsfis cfmsinp
 cfmsnm cfmsobs cfmsopt cfmspm cfmsrng cfmssln cfmtdat cfmtody
 cfmufrq cfmver cfmwhat cfmwkdy cfmwrng cfmwstr cfmwtnl famegettype
-fameopen fameclose
 hlierr getsta getcls gettyp getbas getobs getfrq);
 
 sub AUTOLOAD {
-    local($constname);
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    # print STDERR "find $AUTOLOAD\n";
-    $val = &Fame::HLI::constant($constname, @_ ? $_[0] : 0);
+    local($Fame::HLI::constname, $Fame::HLI::val);
+    ($Fame::HLI::constname = $Fame::HLI::AUTOLOAD) =~ s/.*:://;
+    # print STDERR "find $Fame::HLI::AUTOLOAD\n";
+    $Fame::HLI::val = &Fame::HLI::constant($Fame::HLI::constname, @_ ? $_[0] : 0);
     if ($! != 0) {
         if ($! =~ /Invalid/) {
-            $AutoLoader::AUTOLOAD = $AUTOLOAD;
+            $AutoLoader::AUTOLOAD = $Fame::HLI::AUTOLOAD;
             goto &AutoLoader::AUTOLOAD;
         }
         else {
-            Carp::croak("Your vendor has not defined Fame macro $constname, used");
+            Carp::croak("Your vendor has not defined Fame macro $Fame::HLI::constname, used");
         }
     }
-    eval "sub $AUTOLOAD { $val }";
-    goto &$AUTOLOAD;
+    eval "sub $Fame::HLI::AUTOLOAD { $Fame::HLI::val }";
+    goto &$Fame::HLI::AUTOLOAD;
 }
+
+package Fame::HLI::var_status; sub t { }
+package Fame::HLI::var_version; sub t { }
+
+package Fame::HLI;
 
 bootstrap Fame::HLI;
 
-tie $status, Fame::HLI::var_status, "status";
-tie $version, Fame::HLI::var_version, "version";
+tie $Fame::HLI::status, "Fame::HLI::var_status", "status";
+tie $Fame::HLI::version, "Fame::HLI::var_version", "version";
 
 package Fame::HLI;
 # HLI.pm version number

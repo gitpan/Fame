@@ -4,13 +4,10 @@ use ExtUtils::MakeMaker;
 
 &WriteMakefile(
                "NAME" => "Fame",
-	       "VERSION" => "2.0c"
+	       "VERSION" => "2.0d"
 		);
 
-sub MY::test {'
-test: fame.test
-	$(FULLPERL) fame.test
-
+sub MY::postamble {'
 patchperl:
 	mv $(FULLPERL) $(FULLPERL).old
 	$(FULLPERL).old -p -e s/_Error/_ErroX/g $(FULLPERL).old \

@@ -49,3 +49,14 @@ Fame::HLI, Fame::DB.  Added Fame::LANG package.
 5/18/97  Fix famewrite and fameread error status
 5/20/97  Fix problem with $Fame::HLI::status
 5/20/97  Fixed a couple of minor memory leaks
+
+2.0d 5/97
+
+5/20/97  Use test.pl instead of fame.test for testing
+5/21/97  Fix small bug with LANG::exec (David Blob)
+6/26/97  Check for correct cppstdin; compile with 5.004
+7/5/97   Add some MS Windows support
+7/8/97   Check for 5.003 binary compatability in 5.004
+7/23/97  Add DATE support to fameread and famewrite (D. Heffernan)
+7/23/97  Restructure fame.c to add STRING support
+7/23/97  Fix $Fame::HLI::status/version core dump!

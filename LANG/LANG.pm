@@ -51,18 +51,20 @@ sub exec {
 
   $cmd="-/$TEMP=".$cmd;
   &Fame::HLI::cfmfame($self->{status}, $cmd);
+  return undef if ($self->{status} != Fame::HLI::HSUCC);
   return &Fame::DB::Read($self->{workdb}, $TEMP, $start, $end);
 }
  
 sub inp {
   my($self,@files)=@_;
   my($v,$vp)=("","");
+  local($_);
   foreach $v (@files) {
     open(XFAME, "<$v") || return undef;
-    while($v=<XFAME>) {
+    while(<XFAME>) {
       # account for multi-line statements
-      if ($v =~ s/&&\s*$//) { $vp.=$v."\n"; }
-      &Fame::HLI::cfmfame($self->{status}, $vp.$v);
+      if (s/&&\s*$//) { $vp.=$_."\n"; }
+      &Fame::HLI::cfmfame($self->{status}, $vp.$_);
       if ($self->{status} != &Fame::HLI::HSUCC) { return undef; }
     }
     close(XFAME);

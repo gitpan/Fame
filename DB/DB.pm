@@ -302,7 +302,7 @@ sub new {
 
 sub append {
   my $self = shift;
-  my $mode, $db, @dbl;
+  my($mode, $db, @dbl);
   $mode=&Fame::HLI::HRMODE;
   foreach $db (@_) {
     #print STDERR "check $db\n";

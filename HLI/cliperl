@@ -95,7 +95,7 @@ XS(${pfx}_var_${alias}_TIESCALAR)
         HV   *stash;
         name = SvPV(ST(1),na);
         ret = newSVpv(name, strlen(name));
-        stash = gv_stashpv("${pg}_var_${alias}", 0);
+        stash = gv_stashpv("${pg}::var_${alias}", 0);
         ST(0) = sv_bless(newRV(ret), stash);
         XSRETURN(1);
 }

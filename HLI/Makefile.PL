@@ -1,8 +1,18 @@
 #!../../../perl
 
 use ExtUtils::MakeMaker;
-
+use Config;
+ 
 $FAME="/usr/local/fame" unless $FAME=$ENV{FAME};
+
+# what is the right cpp command?
+$CPP = $Config{'cppstdin'};
+if ($CPP eq "") { $CPP = "cc -E"; }
+
+# using Win95 or Win NT?
+$WIN = eval "use Win32; Win32::GetOSVersion";
+if ($WIN) { $LIBS = ["-L$FAME -lchli"]; }
+else { $LIBS = ["-L$FAME/hli -lchli"]; }
 
 &WriteMakefile(
                "NAME" => "Fame::HLI",
@@ -27,7 +37,7 @@ famecons.i: $(FAME)/hli/hli.h h2c
 	perl h2c $(FAME)/hli/hli.h > famecons.i
 
 fame.i: fame.cli cliperl
-	cppstdin $(DEFINE) < fame.cli > fame.cli.out
+	'.$CPP.' $(DEFINE) - < fame.cli > fame.cli.out
 	perl cliperl Fame::HLI Fame fame.cli.out fameperl.h \
 		fame.i fameinit.i fame.xtra fameval.i fameset.i
 ';

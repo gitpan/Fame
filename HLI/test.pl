@@ -1,5 +1,5 @@
 #!../../perl
-# FT 9/22/95
+# FT 7/23/97
 
 
 use Fame;
@@ -8,30 +8,6 @@ use Fame;
 # for fxns
 
 package Fame::HLI;
-
-use Config;
-# print "p=",$Config{perlpath}, "\n";
-
-if (-M "patch.log" > -M $Config{perlpath}) {
-    print "Warning:  You may have rebuilt the PERL executable\n";
-    print "          since the last time you patched it.\n";
-    print "$Config{perlpath} is ", -M $Config{perlpath}, " days old\n";
-    print "patch.log is ", -M "patch.log", " days old\n";
-    $patch=1;
-}
-if (! -f "patch.log") {
-    print "Warning:  You have not patched the PERL executable.\n";
-    $patch=1;
-}
-if ($patch) {
-  print "If you continue you may get a segmentation fault.\n";
-  print "See the README file for patching instructions.\n";
-  print "Do you wish to continue? ";
-  $y = <STDIN>;
-  if ($y !~ /^[Yy]/) {
-    die "Run 'make patchperl' or 'make patchsolaris'\n";
-  }
-}
 
 # unbuffered output
 $|=1;
@@ -43,7 +19,7 @@ system("rm test.db") if -e "test.db";
 # Fame::HLI
 #
 
-print "Fame::HLI\n";
+print "Fame::HLI....ok\n";
 
 $k=&fameopen("test.db",&HCMODE);
 die "open failed [$Fame::HLI::status]" if $k==-1;
@@ -57,11 +33,12 @@ $name="T1";
 @d=&famegetinfo($k,$name);
 
 eval { $n=&hli_freq($d[2]); if ($n eq "") {print "FRB error\n"; $errors++;} };
-print "FRB extensions not loaded\n" if $@;
+print "FRB extensions not loaded--not a problem\n" if $@;
 
 eval { $n=&getfrq($d[2]); if ($n eq "") {print "HLILIB error\n"; $errors++;} };
-print "HLILIB extensions not loaded\n" if $@;
+print "HLILIB extensions not loaded--not a problem\n" if $@;
 
+print "dates......";
 # test dates
 &cfmddat($stat,&HDAILY,$date,1993,5,2);
 die "DATE FAILED date prob 1" if $stat != &HSUCC;
@@ -70,12 +47,12 @@ die "DATE FAILED date prob 2" if $stat != &HSUCC;
 &cfmddat($stat,&HDAILY,$date2,$y,$m,$d);
 die "DATE FAILED date prob 3" if $stat != &HSUCC;
 die "DATE FAILED date prob 4" if $date2!=$date;
-print "DATE OK\n";
+print "ok\n";
 
 # write some data to the new object
 @data=(5,4,3,7,1,2,7,4,3,5,4,6,7,4,2,8,6,4,5,4);
 
-print "writing. . . ";
+print "writing....";
 $stat = &famewrite($k,$name,1990,1,@data);
 if ($stat) {
   print "WRITE FAILED ($stat) !!!\n";
@@ -83,13 +60,14 @@ if ($stat) {
 }
 # post
 &cfmpodb($stat,$k);
+print "ok\n";
 
 # get the object's information
 @d=&famegetinfo($k,$name);
 # print "Info $name ($k): ",join(",",@d),"\n";
 
 # read that data back
-print "reading. . . ";
+print "reading....";
 @l=&fameread($k,$name,$d[5],$d[6],$d[7],$d[8]);
 $x=join(" ",@l);
 
@@ -102,26 +80,30 @@ if ($flag>0) {
   $errors++;
 }
 else {
-  print "READ/WRITE OK\n";
+  print "ok\n";
 }
 
+print "status codes.....";
 $s = &cfmcpob($stat, $k, $k, "abcdefg", "testxyz");
 if ($s==0 || $stat==0 || $stat != $s) {
   print "ERROR returning correct status\n";
   $errors++;
 }
+print "ok\n";
 
 # close
+print "closing.....";
 if (! &fameclose($k)) {
   print "ERROR closing test database [$Fame::HLI::status]\n";
   $errors++;
 }
+print "ok\n";
 
 #
 # Fame::DB
 #
 
-print "Fame::DB Read/Write ";
+print "Fame::DB Read/Write....";
 $p=new Fame::DB "test", &Fame::HLI::HUMODE;
 if ($p) {
   $p->Write($name,@data);
@@ -133,7 +115,7 @@ if ($p) {
   if ($flag>0) {
     print "FAILED for $flag items!\n";
     $errors++;
-  } else { print "OK\n"; }
+  } else { print "ok\n"; }
   $p->destroy;
 }
 else {
@@ -141,7 +123,7 @@ else {
   $errors++;
 }
 
-print "Fame::DB TIE ";
+print "Fame::DB TIE.....";
 tie %h, Fame::DB, &Fame::HLI::HUMODE, "test";
 $h{$name} = \@data;
 @l = @{$h{$name}};
@@ -152,14 +134,14 @@ foreach $x (0..$#i-1) {
 if ($flag>0) {
   print "FAILED for $flag items!\n";
   $errors++;
-} else { print "OK\n"; }
+} else { print "ok\n"; }
 untie %h;
 
 #
 # Fame::LANG
 #
 
-print "Fame::LANG ";
+print "Fame::LANG.....";
 $x=new Fame::LANG;
 if ($x->{status} != &Fame::HLI::HSUCC) {
   print "FAILED to open new object\n";
@@ -173,7 +155,7 @@ if ($x->command("x=15")->{status} != &Fame::HLI::HSUCC) {
 if ($v != 15) {
   print "FAILED exec()!\n";
   $errors++;
-} else { print "OK\n"; }
+} else { print "ok\n"; }
 $x->destroy;
 
 #
@@ -185,6 +167,6 @@ if ($errors) {
   exit($errors);
 }
 
-print "ALL TESTS OK\n";
-#system("rm test.db");
+print "All tests ok\n";
+system("rm test.db");
 exit(0);

@@ -1,5 +1,6 @@
 /* frb fame stuff */
 /* m1fxt00 Dec 1994 for Perl5 */
+/* other changes 7/23/97 */
 
 #include <memory.h>
 #include <malloc.h>
@@ -28,6 +29,205 @@ char            *version="2.01";
 
 /* include constants code */
 #include "famecons.i"
+
+int Fame_getsize(int typ)
+{
+    int sz;
+    if (typ >= HDAILY) { typ = HDATE; }
+
+    switch (typ) {
+    case HNUMRC:
+      sz = sizeof(float);
+      break;
+    case HBOOLN:
+      sz = sizeof(int);
+      break;
+    case HPRECN:
+      sz = sizeof(double);
+      break;
+    case HUNDFT:
+      sz = 0;
+    case HDATE:
+      sz = sizeof(int);
+      break;
+    default:
+      sz = 0;
+    }
+
+    return sz;
+}
+
+/*
+   set an item in valary = the value of sv
+*/
+int Fame_setVAL(SV *sv, int typ, float *valary, int i)
+{
+    float *pf;
+    int *pi;
+    double *pd;
+    char *ss;
+
+    if (typ >= HDAILY) { typ = HDATE; }
+    
+    switch (typ) {
+    case HNUMRC:
+      pf = (float *) valary;
+      break;
+    case HBOOLN:
+      pi = (int *) valary;
+      break;
+    case HPRECN:
+      pd = (double *) valary;
+      break;
+    case HDATE:
+      pi = (int *) valary;
+      break;
+    }
+
+    ss = SvPV(sv, na);
+
+    switch (typ) {
+    case HNUMRC:
+      if (ss[0] == 'N') {
+        if (strcmp(ss, "NC") == 0)
+          pf[i] = FNUMNC;
+        else if (strcmp(ss, "ND") == 0)
+          pf[i] = FNUMND;
+        else if (strcmp(ss, "NA") == 0)
+          pf[i] = FNUMNA;
+        else
+          pf[i] = (float) SvNV(sv);
+      } else
+        pf[i] = (float) SvNV(sv);
+      break;
+    case HBOOLN:
+      if (ss[0] == 'N') {
+        if (strcmp(ss, "NC") == 0)
+          pi[i] = FBOONC;
+        else if (strcmp(ss, "ND") == 0)
+          pi[i] = FBOOND;
+        else if (strcmp(ss, "NA") == 0)
+          pi[i] = FBOONA;
+        else
+          pi[i] = (int) SvIV(sv);
+      } else
+        pi[i] = (int) SvIV(sv);
+      break;
+    case HDATE:
+      if (ss[0] == 'N') {
+        if (strcmp(ss, "NC") == 0)
+          pi[i] = FDATNC;
+        else if (strcmp(ss, "ND") == 0)
+          pi[i] = FDATND;
+        else if (strcmp(ss, "NA") == 0)
+          pi[i] = FDATNA;
+        else
+          pi[i] = (int) SvIV(sv);
+      } else
+        pi[i] = (int) SvIV(sv);
+      break;
+    case HPRECN:
+      if (ss[0] == 'N') {
+        if (strcmp(ss, "NC") == 0)
+          pd[i] = FPRCNC;
+        else if (strcmp(ss, "ND") == 0)
+          pd[i] = FPRCND;
+        else if (strcmp(ss, "NA") == 0)
+          pd[i] = FPRCNA;
+        else
+          pd[i] = (double) SvNV(sv);
+      } else
+        pd[i] = (double) SvNV(sv);
+      break;
+    case HNAMEL:  /* ignore i in strings, etc */
+    case HSTRNG:
+      if (ss[0] == 'N') {
+        if (strcmp(ss, "NC") == 0)
+          memcpy(valary, FSTRNC, HSMLEN);
+        else if (strcmp(ss, "ND") == 0)
+          memcpy(valary, FSTRND, HSMLEN);
+        else if (strcmp(ss, "NA") == 0)
+          memcpy(valary, FSTRNA, HSMLEN);
+        else
+          valary = (float *) SvPV(sv, na);
+      } else
+        valary = (float *) SvPV(sv, na);
+      break;
+    default:
+      return 0;
+    }
+    return 1;
+}
+
+
+/*
+   set an sv = an item in valary
+*/
+int Fame_setSV(SV *sv, int typ, float *valary, int i)
+{
+    float *pf;
+    int *pi;
+    double *pd;
+    
+    if (typ >= HDAILY) { typ = HDATE; }
+
+    switch (typ) {
+    case HNUMRC:
+      pf = (float *) valary;
+      break;
+    case HBOOLN:
+      pi = (int *) valary;
+      break;
+    case HPRECN:
+      pd = (double *) valary;
+      break;
+    case HDATE:
+      pi = (int *) valary;
+      break;
+    }
+
+    switch (typ) {
+    case HNUMRC:
+      if (pf[i] == FNUMNC) { sv_setpv(sv,"NC"); }
+      else if (pf[i] == FNUMND) { sv_setpv(sv,"ND"); }
+      else if (pf[i] == FNUMNA) { sv_setpv(sv,"NA"); }
+      else { sv_setnv(sv,(double) pf[i]); }
+      break;
+    case HBOOLN:
+      if (pi[i] == FBOONC) { sv_setpv(sv,"NC"); }
+      else if (pi[i] == FBOOND) { sv_setpv(sv,"ND"); }
+      else if (pi[i] == FBOONA) { sv_setpv(sv,"NA"); }
+      else { sv_setiv(sv,(int) pi[i]); }
+      break;
+    case HDATE:
+      if (pi[i] == FDATNC) { sv_setpv(sv,"NC"); }
+      else if (pi[i] == FDATND) { sv_setpv(sv,"ND"); }
+      else if (pi[i] == FDATNA) { sv_setpv(sv,"NA"); }
+      else { sv_setiv(sv,(int) pi[i]); }
+      break;
+    case HPRECN:
+      if (pd[i] == FPRCNC) { sv_setpv(sv,"NC"); }
+      else if (pd[i] == FPRCND) { sv_setpv(sv,"ND"); }
+      else if (pd[i] == FPRCNA) { sv_setpv(sv,"NA"); }
+      else { sv_setnv(sv,(double) pd[i]); }
+      break;
+    case HNAMEL:  /* ignore i in strings, etc */
+    case HSTRNG:
+      if (memcmp((char *)valary, FSTRNC, HSMLEN) == 0)
+        sv_setpv(sv, "NC");
+      else if (memcmp((char *)valary, FSTRND, HSMLEN) == 0)
+        sv_setpv(sv, "ND");
+      else if (memcmp((char *)valary, FSTRNA, HSMLEN) == 0)
+        sv_setpv(sv, "NA");
+      else
+        sv_setpv(sv, (char *)valary);
+      break;
+    default:
+      return 0;
+    }
+    return 1;
+}
+
 
 XS(Fame_constant)
 {
@@ -72,55 +272,12 @@ XS(Fame_cfmgatt)
     pi = (int *) value;
 
     sv_setiv(ST(0), status);
-    sv_setpv(ST(2), (char *) objnam);
-    sv_setiv(ST(3), atttyp);
-    sv_setpv(ST(4), (char *) attnam);
+    /* sv_setpv(ST(2), (char *) objnam); */
+    /* sv_setiv(ST(3), atttyp); */
+    /* sv_setpv(ST(4), (char *) attnam); */
 
-    if (atttyp >= 8) { atttyp = HBOOLN; }
+    Fame_setSV(ST(5), atttyp, (float *)value, 0);
 
-    switch (atttyp) {
-    case HNUMRC:
-      if (*pf == FNUMNC)
-        sv_setpv(ST(5), "NC");
-      else if (*pf == FNUMND)
-        sv_setpv(ST(5), "ND");
-      else if (*pf == FNUMNA)
-        sv_setpv(ST(5), "NA");
-      else
-        sv_setnv(ST(5), (double) *pf);
-      break;
-    case HBOOLN:
-      if (*pi == FBOONC)
-        sv_setpv(ST(5), "NC");
-      else if (*pi == FBOOND)
-        sv_setpv(ST(5), "ND");
-      else if (*pi == FBOONA)
-        sv_setpv(ST(5), "NA");
-      else
-        sv_setiv(ST(5), (int) *pi);
-      break;
-    case HNAMEL:
-    case HSTRNG:
-      if (memcmp(value, FSTRNC, HSMLEN) == 0)
-        sv_setpv(ST(5), "NC");
-      else if (memcmp(value, FSTRND, HSMLEN) == 0)
-        sv_setpv(ST(5), "ND");
-      else if (memcmp(value, FSTRNA, HSMLEN) == 0)
-        sv_setpv(ST(5), "NA");
-      else
-        sv_setpv(ST(5), value);
-      break;
-    case HPRECN:
-      if (*pd == FPRCNC)
-        sv_setpv(ST(5), "NC");
-      else if (*pd == FPRCND)
-        sv_setpv(ST(5), "ND");
-      else if (*pd == FPRCNA)
-        sv_setpv(ST(5), "NA");
-      else
-        sv_setnv(ST(5), (double) *pd);
-      break;
-    }
     free(value);
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), status);
@@ -144,79 +301,18 @@ XS(Fame_cfmsatt)
     char           *value;
     char            space[255];
     char           *ss;
-    int             pi;
-    float           pf;
-    double          pd;
+    union {
+      int             pi;
+      float           pf;
+      double          pd;
+    } pp;
 
-    ss = SvPV(ST(5),na);
-
-    if (atttyp >= 8) { atttyp = HBOOLN; }
-
-    switch (atttyp) {
-    case HNUMRC:
-      value = (char *) &pf;
-      if (ss[0] == 'N') {
-        if (strcmp(ss, "NC") == 0)
-          pf = FNUMNC;
-        else if (strcmp(ss, "ND") == 0)
-          pf = FNUMND;
-        else if (strcmp(ss, "NA") == 0)
-          pf = FNUMNA;
-        else
-          pf = (float) SvNV(ST(5));
-      } else
-        pf = (float) SvNV(ST(5));
-      break;
-    case HNAMEL:
-    case HSTRNG:
-      value = space;
-      if (ss[0] == 'N') {
-        if (strcmp(ss, "NC") == 0)
-          memcpy(value, FSTRNC, HSMLEN);
-        else if (strcmp(ss, "ND") == 0)
-          memcpy(value, FSTRND, HSMLEN);
-        else if (strcmp(ss, "NA") == 0)
-          memcpy(value, FSTRNA, HSMLEN);
-        else
-          value = SvPV(ST(5), na);
-      } else
-        value = SvPV(ST(5), na);
-      break;
-    case HBOOLN:
-      value = (char *) &pi;
-      if (ss[0] == 'N') {
-        if (strcmp(ss, "NC") == 0)
-          pi = FBOONC;
-        else if (strcmp(ss, "ND") == 0)
-          pi = FBOOND;
-        else if (strcmp(ss, "NA") == 0)
-          pi = FBOONA;
-        else
-          pi = (int) SvIV(ST(5));
-      } else
-        pi = (int) SvIV(ST(5));
-      break;
-    case HPRECN:
-      value = (char *) &pd;
-      if (ss[0] == 'N') {
-        if (strcmp(ss, "NC") == 0)
-          pd = FPRCNC;
-        else if (strcmp(ss, "ND") == 0)
-          pd = FPRCND;
-        else if (strcmp(ss, "NA") == 0)
-          pd = FPRCNA;
-        else
-          pd = (double) SvNV(ST(5));
-      } else
-        pd = (double) SvNV(ST(5));
-      break;
-    }
-
-    (void) cfmsatt(&status, dbkey, objnam, atttyp, attnam, value);
+    Fame_setVAL(ST(5), atttyp, (float *)&pp, 0);
+    (void) cfmsatt(&status, dbkey, objnam, atttyp, attnam, (char *) &pp);
 
     sv_setiv(ST(0), status);
-    sv_setpv(ST(2), objnam);
-    sv_setpv(ST(4), attnam);
+    /* sv_setpv(ST(2), objnam); */
+    /* sv_setpv(ST(4), attnam); */
 
     ST(0) = sv_newmortal();
     sv_setiv(ST(0), status);
@@ -391,16 +487,16 @@ XS(Fame_fameread)
     int             range[3];
     int             numobs = -1;
     float          *valary;
+    char          **cv;
+    int            *misary;
+    int            *lenary;
     float          *mistt;
     int             sz;
-    float          *pf;
-    double         *pd;
-    int            *pi;
     int             i;
 
     freq = famegetfreq(dbkey, series);
     typ = famegettype(dbkey, series);
-    if (typ >= 8) { typ = HBOOLN; }
+
     class = famegetclass(dbkey, series);
     if (class==HSERIE) {
       if (items == 6) {
@@ -424,107 +520,64 @@ XS(Fame_fameread)
       numobs=1;
     }
 
-    switch (typ) {
-    case HNUMRC:
-      sz = sizeof(float);
-      break;
-    case HBOOLN:
-      sz = sizeof(int);
-      break;
-    case HPRECN:
-      sz = sizeof(double);
-      break;
-    case HUNDFT:
-      sz = 0;
-    default:  sz = 0;
-    }
+    sz = Fame_getsize(typ);
     if (sz == 0) {
       /* croak("Fame error: Invalid data type"); */
       XSRETURN_UNDEF;
     }
-    valary = (float *) malloc(numobs * sz);
 
-    cfmrrng(&status, dbkey, series, range, valary, HNTMIS, mistt);
-    f_status = status;
+    if (typ != HNAMEL && typ != HSTRNG) {
+
+      valary = (float *) malloc(numobs * sz);
+      cfmrrng(&status, dbkey, series, range, valary, HNTMIS, mistt);
+      f_status = status;
+
+    } else {
+
+      cv = (char **) malloc(numobs * sizeof(char *));
+      misary = (int *) malloc(numobs * sizeof(int));
+      lenary = (int *) malloc(numobs * sizeof(int));
+      for (i = 0; i < numobs; i++)
+        cv[i] = (char *) malloc(200 * sizeof(char));
+      cfmrsts(&status, dbkey, series, range, cv, misary, lenary);
+      f_status = status;
+
+    }
+
     if (status != HSUCC) {
-      /* fprintf(stderr,"HLI(%d)",status); */
-      /* croak("Fame error: Read failed"); */
-      free(valary);
+      if (typ != HNAMEL && typ != HSTRNG)
+        free(valary);
+      else {
+        free(misary);
+        free(lenary);
+        for (i = 0; i < numobs; i++)
+          free(cv[i]);
+        free(cv);
+      }
       XSRETURN_UNDEF;
     }
 
     EXTEND(sp, numobs);
 
-    switch (typ) {
-    case HNUMRC:
-      pf = (float *) valary;
-      break;
-    case HBOOLN:
-      pi = (int *) valary;
-      break;
-    case HPRECN:
-      pd = (double *) valary;
-      break;
-    }
     for (i = 0; i < numobs; i++) {
-      switch (typ) {
-      case HNUMRC:
-        if (pf[i] == FNUMNC) {
-          ST(i)=sv_newmortal();
-          sv_setpv(ST(i),"NC");
-        }
-        else if (pf[i] == FNUMND) {
-          ST(i)=sv_newmortal();
-          sv_setpv(ST(i),"ND");
-        }
-        else if (pf[i] == FNUMNA) {
-          ST(i)=sv_newmortal();
-          sv_setpv(ST(i),"NA");
-        }
-        else {
-          ST(i)=sv_newmortal();
-          sv_setnv(ST(i),(double) pf[i]);
-        }
-        break;
-      case HBOOLN:
-        if (pi[i] == FBOONC) {
-          ST(i)=sv_newmortal();
-          sv_setpv(ST(i),"NC");
-        }
-        else if (pi[i] == FBOOND) {
-          ST(i)=sv_newmortal();
-          sv_setpv(ST(i),"ND");
-        }
-        else if (pi[i] == FBOONA) {
-          ST(i)=sv_newmortal();
-          sv_setpv(ST(i),"NA");
-        }
-        else {
-          ST(i)=sv_newmortal();
-          sv_setiv(ST(i),(int) pi[i]);
-        }
-        break;
-      case HPRECN:
-        if (pd[i] == FPRCNC) {
-          ST(i)=sv_newmortal();
-          sv_setpv(ST(i),"NC");
-        }
-        else if (pd[i] == FPRCND) {
-          ST(i)=sv_newmortal();
-          sv_setpv(ST(i),"ND");
-        }
-        else if (pd[i] == FPRCNA) {
-          ST(i)=sv_newmortal();
-          sv_setpv(ST(i),"NA");
-        }
-        else {
-          ST(i)=sv_newmortal();
-          sv_setnv(ST(i),(double) pd[i]);
-        }
-        break;
+      ST(i) = sv_newmortal();
+      if (typ==HSTRNG || typ==HNAMEL) {
+        Fame_setSV(ST(i), typ, (float *)cv[i], 0);
+      } else {
+        Fame_setSV(ST(i), typ, valary, i);
       }
     }
-    free(valary);
+
+    if (typ != HNAMEL && typ != HSTRNG)
+      free(valary);
+    else {
+      free(misary);
+      free(lenary);
+      for (i = 0; i < numobs; i++)
+        free(cv[i]);
+      free(cv);
+    }
+
     if (numobs > 0) {
       XSRETURN(numobs);
     } 
@@ -545,13 +598,10 @@ XS(Fame_famereadn)
     int             retval = 1;
     int             dbkey = (int) SvIV(ST(0));
     char           *series = (char *) SvPV(ST(1), na);
-    int             wntobs = (int) SvIV(ST(2));
+    int             numobs = (int) SvIV(ST(2));
     int             tmiss = (int) SvIV(ST(6));
 
     int             i;
-    float          *pf;
-    int            *pi;
-    double         *pd;
     char          **cv;
     int             sz;
     int            *misary;
@@ -563,9 +613,12 @@ XS(Fame_famereadn)
     int             sprd;
     float          *valary;
     float          *mistt;
-    double          md[3];
-    float           mf[3];
-    int             mi[3];
+    union {
+      double          md[3];
+      float           mf[3];
+      int             mi[3];
+    } misttu;
+
     int             range[3];
 
     range[0] = (int) SvIV(ST(3));
@@ -573,97 +626,55 @@ XS(Fame_famereadn)
     range[2] = (int) SvIV(ST(5));
 
     typ = famegettype(dbkey, series);
-    if (typ >= 8) { typ = HBOOLN; }
 
-    switch (typ) {
-    case HNUMRC:
-      mf[0] = (float) SvNV(ST(7));
-      mf[1] = (float) SvNV(ST(8));
-      mf[2] = (float) SvNV(ST(9));
-      sz = sizeof(float);
-      mistt = (float *) mf;
-      break;
-    case HSTRNG:
-    case HNAMEL:
-      sz = sizeof(char);
-      break;
-    case HBOOLN:
-      mi[0] = (int) SvIV(ST(7));
-      mi[1] = (int) SvIV(ST(8));
-      mi[2] = (int) SvIV(ST(9));
-      sz = sizeof(int);
-      mistt = (float *) mi;
-      break;
-    case HPRECN:
-      md[0] = (double) SvIV(ST(7));
-      md[1] = (double) SvIV(ST(8));
-      md[2] = (double) SvIV(ST(9));
-      sz = sizeof(double);
-      mistt = (float *) md;
-      break;
-    default:
-      sz = 0;
-    }
+    mistt = misttu.mf;
+    Fame_setVAL(ST(7), typ, mistt, 0);
+    Fame_setVAL(ST(8), typ, mistt, 1);
+    Fame_setVAL(ST(9), typ, mistt, 2);
+
+    sz = Fame_getsize(typ);
 
     if (typ != HNAMEL && typ != HSTRNG) {
-      valary = (float *) malloc(wntobs * sz);
+
+      valary = (float *) malloc(numobs * sz);
       cfmrrng(&status, dbkey, series, range, valary, tmiss, mistt);
       f_status = status;
+
     } else {
-      cv = (char **) malloc(wntobs * sizeof(char *));
-      misary = (int *) malloc(wntobs * sizeof(int));
-      lenary = (int *) malloc(wntobs * sizeof(int));
-      for (i = 0; i < wntobs; i++)
-        cv[i] = (char *) malloc(100 * sizeof(char));
+
+      cv = (char **) malloc(numobs * sizeof(char *));
+      misary = (int *) malloc(numobs * sizeof(int));
+      lenary = (int *) malloc(numobs * sizeof(int));
+      for (i = 0; i < numobs; i++)
+        cv[i] = (char *) malloc(200 * sizeof(char));
       cfmrsts(&status, dbkey, series, range, cv, misary, lenary);
       f_status = status;
+
     }
 
-    EXTEND(sp, wntobs);
+    EXTEND(sp, numobs);
 
-    switch (typ) {
-    case HNUMRC:
-      pf = (float *) valary;
-      break;
-    case HBOOLN:
-      pi = (int *) valary;
-      break;
-    case HPRECN:
-      pd = (double *) valary;
-      break;
-    }
-    for (i = 0; i < wntobs; i++) {
-      switch (typ) {
-      case HNUMRC:
-        ST(i)=sv_newmortal();
-        sv_setnv(ST(i), (double) pf[i]);
-        break;
-      case HSTRNG:
-      case HNAMEL:
-        ST(i)=sv_newmortal();
-        sv_setpv(ST(i), cv[i]);
-        break;
-      case HBOOLN:
-        ST(i)=sv_newmortal();
-        sv_setiv(ST(i), (int) pi[i]);
-        break;
-      case HPRECN:
-        ST(i)=sv_newmortal();
-        sv_setnv(ST(i), (double) pd[i]);
-        break;
+    for (i = 0; i < numobs; i++) {
+      ST(i) = sv_newmortal();
+      if (typ==HSTRNG || typ==HNAMEL) {
+        Fame_setSV(ST(i), typ, (float *)cv[i], 0);
+      } else {
+        Fame_setSV(ST(i), typ, valary, i);
       }
     }
+
     if (typ != HNAMEL && typ != HSTRNG)
       free(valary);
     else {
       free(misary);
       free(lenary);
-      for (i = 0; i < wntobs; i++)
+      for (i = 0; i < numobs; i++)
         free(cv[i]);
       free(cv);
     }
-    if (wntobs > 0) {
-      XSRETURN(wntobs);
+
+    if (numobs > 0) {
+      XSRETURN(numobs);
     }
     else {
       XSRETURN_UNDEF;
@@ -695,9 +706,6 @@ XS(Fame_famewrite)
     float          *mistt;
     int             typ;
     int             sz;
-    float          *pf;
-    double         *pd;
-    int            *pi;
     char           *ss;
     int             i;
 
@@ -712,91 +720,24 @@ XS(Fame_famewrite)
     typ = famegettype(dbkey, series);
     cfmsrng(&status, freq, &year, &prd, &eyear, &eprd, range, &numobs);
     f_status = status;
-    switch (typ) {
-    case HNUMRC:
-      sz = sizeof(float);
-      break;
-    case HBOOLN:
-      sz = sizeof(int);
-      break;
-    case HPRECN:
-      sz = sizeof(double);
-      break;
-    case HUNDFT:
-      sz = 0;
-    default:
-      sz = 0;
-    }
-    if (sz == 0) {
-      /* croak("Fame error: unsupported data type"); */
+
+    sz = Fame_getsize(typ);
+    if (sz == 0) { /* croak("Fame error: unsupported data type"); */
       ST(0)=sv_newmortal();
       sv_setiv(ST(0), HBOBJT);
       XSRETURN(1);
     }
+
     valary = (float *) malloc(numobs * sz);
     mistt = (float *) malloc(3 * sz);
-    switch (typ) {
-    case HNUMRC:
-      pf = (float *) valary;
-      break;
-    case HBOOLN:
-      pi = (int *) valary;
-      break;
-    case HPRECN:
-      pd = (double *) valary;
-      break;
-    }
+
     for (i = 0; i < numobs; i++) {
-      ss = SvPV(ST(i+4), na);
-      switch (typ) {
-      case HNUMRC:
-        if (ss[0] == 'N') {
-          if (strcmp(ss, "NC") == 0)
-            pf[i] = FNUMNC;
-          else if (strcmp(ss, "ND") == 0)
-            pf[i] = FNUMND;
-          else if (strcmp(ss, "NA") == 0)
-            pf[i] = FNUMNA;
-          else
-            pf[i] = (float) SvNV(ST(i + 4));
-        } else
-          pf[i] = (float) SvNV(ST(i + 4));
-        break;
-      case HBOOLN:
-        if (ss[0] == 'N') {
-          if (strcmp(ss, "NC") == 0)
-            pi[i] = FBOONC;
-          else if (strcmp(ss, "ND") == 0)
-            pi[i] = FBOOND;
-          else if (strcmp(ss, "NA") == 0)
-            pi[i] = FBOONA;
-          else
-            pi[i] = (int) SvIV(ST(i + 4));
-        } else
-          pi[i] = (int) SvIV(ST(i + 4));
-        break;
-      case HPRECN:
-        if (ss[0] == 'N') {
-          if (strcmp(ss, "NC") == 0)
-            pd[i] = FPRCNC;
-          else if (strcmp(ss, "ND") == 0)
-            pd[i] = FPRCND;
-          else if (strcmp(ss, "NA") == 0)
-            pd[i] = FPRCNA;
-          else
-            pd[i] = (double) SvNV(ST(i + 4));
-        } else
-          pd[i] = (double) SvNV(ST(i + 4));
-        break;
-      }
+      Fame_setVAL(ST(i+4), typ, valary, i);
     }
+
     cfmwrng(&status, dbkey, series, range, valary, HNTMIS, mistt);
     f_status = status;
-    /*if (status != HSUCC) {*/
-      /* fprintf(stderr,"HLI(%d)",status); */
-      /* croak("Fame error: Write failed"); */
-      /* XSRETURN_UNDEF; */
-    /*}*/
+
     free(valary);
     ST(0)=sv_newmortal();
     sv_setiv(ST(0), status);
@@ -825,8 +766,6 @@ XS(boot_Fame__HLI)
   newXS("Fame::HLI::famestop", Fame_famestop, fn);
   newXS("Fame::HLI::cfmgatt", Fame_cfmgatt, fn);
   newXS("Fame::HLI::cfmsatt", Fame_cfmsatt, fn);
-  newXS("Fame::HLI::famestart", Fame_famestart, fn);
-  newXS("Fame::HLI::famestop", Fame_famestop, fn);
   newXS("Fame::HLI::fameopen", Fame_fameopen, fn);
   newXS("Fame::HLI::fameclose", Fame_fameclose, fn);
   newXS("Fame::HLI::fameread", Fame_fameread, fn);
