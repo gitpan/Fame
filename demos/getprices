@@ -1,0 +1,16 @@
+#!/usr/local/bin/perl
+#
+# getprice -- this script does not run.
+#
+
+use Fame;
+
+$db = new Fame::DB "prices";
+
+$day = "1jan95";
+@tickers = qw(IBM,DEC,MSFT);
+
+foreach (@tickers) {
+  ($price) = $db->Read("$_.CLOSE", $day);
+  printf "%s\t%s\n", $_, $price;
+}

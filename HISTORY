@@ -1,0 +1,38 @@
+fameperl
+
+1.0  8/93 Public Domain
+
+The first vesion was developed for perl 4.036 at the Federal Reserve to 
+facilitate importing data into FAME and extracting data.  Implemented 
+most C HLI functions.  The code was written using the h2c and h2i 
+programs and a modified version of "mus".
+
+1.1  Public Domain
+
+Modified utilities to handle missing values and sometimes strings.  
+Changed source code to use "cliperl" so that most of the same source code
+can be used for perl and tcl.
+
+1.2  12/94 Public Domain
+
+Ported to perl 5.000 and added support for FAME 7.5.  Last public
+domain version available from the Federal Reserve.  Probably very
+buggy and hardly used at all.
+
+2.0  9/95
+
+Ported to perl5.001.  Added object-oriented utilitites and a 
+TIEHASH interface.  Wrote "pod" documentation.
+
+2.0a  9/95
+
+Bug fixes.  Reorganized Fame package into two packages: 
+Fame::HLI, Fame::DB.  Added Fame::LANG package.
+
+10/2/95  First alpha distribution.
+10/4/95  Change syntax of Fame::DB::new to be just like TIEHASH.
+11/15/95 Add general support for DATE values in HLI utilities.
+         Fix cfmdati bug (make datstr output).
+5/7/96   Clean up fame.c.
+6/27/96  Remove autosplit support and make other changes
+         to the make process so it works with perl5.003.

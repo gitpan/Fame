@@ -1,0 +1,497 @@
+                  A Fame interface for Perl and Tcl
+
+ 
+                            Fernando Trias
+                            August 9, 1995
+
+                      A draft prepared for Fame
+                  derived from work performed at the
+                Federal Reserve Board, Washington, DC
+                          from 1993 to 1995
+
+
+                     Author's permanent address:
+                         7151 SW 103 Ct. Cir.
+                           Miami, FL 33173
+                                 USA
+
+                           Current address:
+                       132 1/2 Oxford St Apt 6
+                         Cambridge, MA 02140
+                                 USA
+
+                        Current email address:
+                        ftrias@helix.fmrco.com
+ 
+
+                               Abstract
+
+This paper describes the design, implementation and use of a general-
+purpose interface between Fame and the widely available programming
+languages Perl and Tcl.  The interface was developed using a macro
+package which helps generates appropriate "glue" for Tcl or Perl from
+the same source files.  This paper also describes several applications
+created using these interfaces.
+
+
+INTRODUCTION
+------------
+
+This paper is divided into four parts.  The first is the introduction
+which describes the justification for this paper.  Then, the interface
+is described.  The third section shows various examples of the use
+of this utility.  Of special interest is the example of how this
+technology was used in conjunction with World-Wide-Web technology to
+offer a uniform method for accessing macroeconomic data at the Federal
+Reserve Board.  After the conclusion, the apendicies give more
+technical information about the interface and tools used to create it.
+
+
+WHY PERL OR TCL?
+
+First, it is useful to ask what benefits Perl or Tcl will give you
+beyond the Fame 4GL and the Fortran or C HLI.
+
+Tcl is a general purpose, easy to learn, extensible scripting
+language.  Tcl was designed to be a central mechanism where different
+extensions or modules can be executed and share data.  The most
+important of these extensions is Tk, which provides a simple common
+interface to various windowing environments such as Unix X-Windows or
+MS-Windows.  There is also a BLT extension which provides numerous
+facilities for generating charts and graphs dynamically.
+
+Fame already provides its Fame-Windows package which, although not as
+widely used or flexible as Tk, is sufficiently powerful for many
+applications.  However, many Tcl extensions exists which access Sybase, 
+Oracle, Ingres and other database products, so that Tcl offers a 
+significant advantage when the program must manipulate data from 
+various source.  Also, since Tcl is a scripting language it is very 
+efficient when the data must be processed through various different 
+programs.  Furthermore, the file and string processing capabilities of 
+Tcl are very powerful (though not as powerful as Perl's).
+
+Perl is another general purpose extensible scripting language which
+has more core features than Tcl and was designed, among other things,
+for text processing.  Many extensions are also available which allow
+access to Informix, Ingres, Interbase, Oracle, Sybase and others.  The
+Tk extension is also available for Perl, but not as widely used.  Perl
+has many facilities for sorting information and converting between
+different binary and text data formats (see the tape loading example
+far below).
+
+It can be argued that Fame performs most of the functions of these
+languages.  However, it does so with much difficulty and very slowly,
+particularly reading files and manipulating strings.  Fame's strength
+lies in its representation of time-series data, its reporting
+facility, the analytical tools the Fame 4GL provides, and many other
+areas.  However, use of Perl or Tcl has the advantages described above
+which I have sought to exploit through the various examples shown on
+this paper.
+
+
+THE FAME INTERFACE
+------------------
+
+For the purposes of this discussion, I will call the Perl interface
+FamePerl and the Tcl interface FameTcl.
+
+Fame provides a way to access its data through a series of C or
+Fortran libraries known as the HLI.  FamePerl and FameTcl are
+adaptations of the C HLI library for the calling conventions of these
+languages.  This adaptation is generally performed by adding a
+"wrapper" or "glue" around each of the C HLI functions which converts
+values to and from the format of Perl or Tcl.  This section describes
+the interface is some detail.
+
+
+SUMMARY
+
+1.  All but 6 C HLI version 7.5 functions are fully implemented in
+    native Perl and Tcl code.  Not implemented: cfmlsts, cfmrdfa,
+    cfmrrng, cfmrsts, cfmwrng, cfmwsts.
+
+2.  For implementations with the FRB extensions (various
+    utilites created at the Federal Reserve), all hli_* functions
+    are implemented fully.  Famedbpath is also implemented.
+
+3.  New Perl-like and Tcl-like functions have been added (see Fame
+    Utilities).
+
+4.  Values of hli.h are available.
+
+
+C HLI
+
+The typical C HLI function is translated directly into Perl with
+little modification.  For example, to call cfmddes from C HLI, you
+would use:
+
+  cfmddes(&status,dbkey,desc);
+
+Where "status" and "desc" are defined according to the manual as
+"output" variables, and "dbkey" is an input variable.  
+
+In FamePerl, you would use:
+
+  &cfmddes($status,$dbkey,$desc);
+
+Perl makes no distinction between pointers and values.  Thus, all
+variables (whether output or input) are specified the same way.  Perl
+takes care of modifing those values it has to modify.  The data type
+is not important as this is handled dynamically by the language.
+
+In FameTcl, you would use
+
+  cfmddes status $dbkey desc
+
+Since Tcl does make a distinction between pointers and values, you
+must pass the name of the "output" variables "status" and "desc" and the value
+of "input" variable "dbkey".
+
+
+SPECIAL FUNCTIONS
+
+There are exceptions to this rule.  Functions which use a range or
+translation table (or other array with a limited and fixed length) are
+called with one variable for every array element.  Thus, cfmsrng would
+be called from C as:
+
+  cfmsrng(&status,freq,&sy,&sp,&ey,&ep,range,&numobs);
+
+where range is a three element array.  From Perl, each element of range 
+must be specified.  Thus, you would use the following:
+
+  &cfmsrng($status,$freq,$sy,$sp,$ey,$ep,$range1,$range2,
+			  $range3,$numobs);
+
+The functions which require this type of array expansion are: 
+cfmrstr, cfmsbm, cfmsfis, cfmsnm, cfmspm, cfmwstr.
+
+Functions which access unlimited length arrays such as cfmrrng 
+cannot be implemented using this scheme and therefore are
+unavailable in both FamePerl and FameTcl.  However, replacement
+functions which are functionally equivalent, but called differently,
+have been added.
+
+
+HLI.H
+
+FamePerl and FameTcl provide utilities for converting the values of a
+C header file into an appropriate header file for the language, so 
+that the values of all the constants are available.
+
+
+FAME UTILITIES
+
+There are several functions to assist Perl users in rapidly retrieving
+and updating Fame data.  Since most of the C HLI functions that write
+or read data are not implemented directly, programs should use the
+functions described in this section.
+
+When missing value translation is not specified, missing values are
+returned as string "NA", "ND", "NC" if the object is numeric; this
+will evaluate to a zero in a numeric context.  For strings, "" is
+returned.  Likewise, writing a value of "NA" to a numeric series will
+store an actual NA.  However, there is no way to store NA strings.
+
+The list of functions below is ordered in a special way.  The first
+line is an example of the FamePerl format, the second line is FameTcl
+format, and the indented lines that follow are a summary description.
+
+
+&famestart;
+famestart
+
+  Initialize the Fame hli
+
+ 
+&famestop;
+famestop
+
+  Terminate the Fame hli
+
+
+$dbkey = &fameopen($name);
+set dbkey [ fameopen $name ]
+
+$dbkey = &fameopen($name,$mode);
+set dbkey [ fameopen $name $mode ]
+
+  Open a Fame database.  If the database is not there, then try
+  to open it in the current directory.  Returns -1 on error.
+
+
+&fameclose($dbkey);
+fameclose $dbkey
+
+  Close database.
+
+
+$type = &famegettype($dbkey,$objnam);
+set type [ famegettype $dbkey $objnam ]
+
+  Get an object's type
+	
+
+$freq = &famegetfreq($dbkey,$objnam);
+set freq [ famegetfreq $dbkey $objnam ]
+
+  Get an object's frequency
+
+
+@list = $famegetinfo($dbkey,$objnam);
+set list [ famegetinfo $dbkey $objnam ]
+
+
+  Get object information as in cfmwhats.  The following table
+  describes the order of the elements returned by famegetinfo:
+
+       Name             #
+       ------------    ---
+       class            0
+       type             1
+       freq             2
+       basis            3
+       observed         4
+       first year       5
+       first period     6
+       last year        7
+       last period      8
+       create year      9
+       create month    10
+       create day      11
+       modify year     12
+       modify month    13
+       modify day      14
+       description     15
+       documentation   16
+
+
+@data = &fameread($dbkey,$objnam,$syear,$sprd,$eyear,$eprd);
+set data [ fameread $dbkey $objnam $syear $sprd $eyear $eprd ]
+
+  Read data for the given range of dates.
+
+
+@data = &famereadn($dbkey,$objnam,$numobs,$range1,$range2,$range3
+                   $tmiss,$mistt1,$mistt2,$mistt3);
+set data [ famereadn $dbkey $objnam $numobs $range1 $range2
+                     $range3 $tmiss $mistt1 $mistt2 $mistt3 ]
+
+  Read a given number of value starting with the values of a
+  given range.  Get the rangex values with the functions
+  cfmsrng, cfmsfix.  This function will read the whole range of
+  values, but only store numobs of them.  You can get the
+  value of numobs when setting the range.  The missing value
+  variables must contain data even if no translation is being
+  done.
+
+
+&famewrite($dbkey,$objnam,$year,$prd,@list);
+famewrite $dbkey $objnam $year $prd $list
+
+  Writes out all the elements of @list into the object staring
+  with the given date.
+
+
+EXAMPLES
+--------
+
+WORLD-WIDE-WEB BROWSER AT THE FED
+
+FamePerl was used to develop programs internally at the Federal
+Reserve Board (Fed) for the World-Wide-Web (WWW) which allow users to
+search for or browse through virtually all of the public macroeconomic
+data at the Fed.  All of this data resides on Unix servers, and until
+this project, could therefore only be accessed from Unix.  Using
+FamePerl and WWW technology, users on PCs, Macintoshes, and other Unix
+computers can now access all this data easily through the graphical
+interfaces of a WWW Browser such as Mosaic or Netscape.
+
+Because the WWW has become such a popular and widely discussed
+subject, I will assume the reader has a rudimentary understanding of
+WWW concepts.
+
+
+How does it work?
+
+Without going into much detail, I will try to explain the components
+of the system and how they are integrated.  The project has two simple
+goals.  First, users must search for data.  Then, they must be able to
+view the data and extract it.
+
+There is only one way to extract data, but there are two principal
+ways of searching for data: through tables and by searching for
+descriptions.
+
+
+Tables
+
+Tables are text files which contain lines of text and pointers to
+specific Fame object names.  These tables are modeled after existing
+printed tables which are produced by the various agencies or academic
+institutions.  Users can either perform a string search through the
+titles of all the tables, or browse through one of three indexes.
+
+The first index displays all tables according to the organization
+within the Fed which is responsible for gathering and maintaining each
+table.  Each table has only one maintaining organization so that there
+is a one-to-many relationship between each index entry and each table.
+
+The second index displays all tables according to general economic
+concept.  For example, "Interest rates" contains all the tables which
+have any data pertaining to interest rates.  Clearly, a table may fall
+into more than one category, so that there exists a many-to-many
+relationship.
+
+The last index shows tables according to country of origin.  Again, a
+table may have data from different countries, so the relationship is
+many-to-many.
+
+Users may begin by choosing one of the three indexes, and then one of
+the many index entries.  Then, a list of the titles of all applicable
+tables is shown.  Each table title is a link to the actual table, so
+that the table contents are displayed if a user selects the title.
+Users can also perform string searches on the titles.
+
+If the user displays and browses a table by clicking on the title,
+each Fame object reference in the table is turned into a link to the
+object data (see Object data).
+
+All these indexes, hypertext links, and files are generated using
+Perl.
+
+
+Searching
+
+There is also a form which will allow users to enter complex search
+queries which will be applied to the documentation and description
+attributes of all public Fame objects.  (For the technically curious,
+this data is extracted daily into a flat file using FamePerl; also, a
+simple query cache mechanism was implemented to speed up multiple
+similar queries.)
+
+Once the search is applied, all the matching objects are displayed.
+Users may perform further subqueries on this list.  Each data object
+is shown by its object name, description and documentation.  The
+object name is a link to a the object data.
+
+
+Object data
+
+If a user selects a link to an object's data, the server executes an
+extraction program written in FamePerl which quickly displays the
+object's system attributes and user attributes.  On the same page the
+user can extract the data values by clicking on a button after
+optionally entering a start date, end date and output format.
+
+This data can then be extracted from the browser program and
+manipulated on a spreadsheet, file, or other program using the system
+specific features, such as Cut/Past, OLE, DDE, etc.
+
+
+TAPE LOADS
+
+Another common application is the use of the text-processing power and
+speed of Perl to extract data from tapes, disks or files, and convert
+it into a form suitable for importing into Fame, Sybase, Oracle, or
+another database for which a Perl interface exists.  Perl provides
+several advantages over C or Fortran.  First, Perl is an interpreted
+language which means that it can be easily transported from one
+platform to another.  Second, Perl provides arbitrary length strings
+as well as many simple facilities for converting data in binary format
+(numbers, dates) of one computer into the format of another.  Along
+with the Unix utility dd, byte swapping, EBCDIC conversion, blocking
+and case conversion are very simple.  There are many other technical
+reasons which are beyond the scope of this paper.
+
+
+TRANSFERRING FROM ONE DATABASE TO ANOTHER
+
+Many database extensions have been written for Perl.  The most
+prominent of these are Informix, Ingres, Interbase, Oracle and Sybase.
+With the Fame extension, Perl can be used to easily extract data from
+any source and save it into any target, including, of course, text file
+and the screen using Perl's report generation facilities.
+
+A lot of database extensions have also been written in Tcl.  Tcl could
+be used to create a general data browser or updater.
+
+Third party vendors also provide gateway products through common
+workstation databases for DB2, IMS and other Mainframe databases.
+
+
+AVAILABILITY
+------------
+
+Both FamePerl and FameTcl were developed at the Federal Reserve Board
+in Washington, DC by the author over the course of a year.  FameTcl
+uses Tcl version 7.4; FamePerl is available for version 4.036 and
+version 5.  Information about these programs, as well as the source
+code, may be obtained from the Freedom of Information Office of the
+Fed.  I am also working on a new version for Perl version 5 which may
+be available shortly from me.
+
+
+CONCLUSION
+----------
+
+Fame provides excellent support for time-series data, analysis, report
+generation, graphing, and many other areas.  However, its text-processing
+capabilities, scripting support and Windowing system are very limited.
+FamePerl and FameTcl provide significant advantages in these areas.
+
+
+APPENDICIES
+-----------
+
+COMMON LANGUAGE INTERFACE
+
+This is a technical section describing the interfaces.  It will
+include information from a paper I wrote, but never published because
+it is mildly obsolete.  I will fax you a copy since I no longer
+have an electronic version [insert paper 1 here]
+
+
+INCONSISTENCIES WITH HLI
+
+The following C HLI functions have not been implemented: cfmlsts,
+cfmrdfa, cfmrrng, cfmrsts, cfmwrng, and cfmwsts.
+
+The following C HLI functions have arrays which are flattened (that
+is, a different variable must be used for each array element), or
+functions with slightly modified calling convention.
+
+Name       Parameter
+--------   ----------
+cfmgatt    value
+cfmrstr    range
+cfmsatt    value
+cfmsbm     range
+cfmsdm     range
+cfmsfis    range
+cfmsnm     nmistt
+cfmspm     range
+cfmsrng    range
+cfmwstr    range, strary 
+
+
+The following C HLI functions are version dependent and may not be
+available when linking with older versions of Fame.
+
+Name       Version
+--------   -----------
+cfmawl     7.5
+cfmopre    7.5
+cfmopwk    7.0
+cfmrdfr    7.0
+cfmrdsr    7.5
+cfmrdst    7.0
+cfmrmev    7.5
+cfmrng     7.0
+cfmsinp    7.0
+cfmsopt    7.0
+cfmssln    7.5
+cfmwtfr    7.0
+cfmwtsr    7.0
+cfmwtst    7.0

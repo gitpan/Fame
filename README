@@ -1,0 +1,160 @@
+
+                            Fameperl 2 alpha 4
+                            ------------------
+
+                              Fernando Trias
+
+            Parts of this software are in the public domain.
+            Changes and additions are Copyright 1995, 1996 by 
+            Fernando Trias. All rights reserved.
+
+------------------------------------------------------------------------
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU license or the Artistic
+    License, a copy of which can be found with the perl distribution.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    license for more details.
+------------------------------------------------------------------------
+
+THIS IS TEST SOFTWARE AND SHOULD NOT BE REDISTRIBUTED EXCEPT FOR TEST
+PURPOSES.  PLEASE CONTACT THE AUTHOR IF YOU HAVE ANY QUESTIONS,
+PROBLEMS OR COMMENTS.
+
+Fameperl contains FAME extensions for Perl 5.  FAME is a registered
+trademark of FAME Information Services Inc.  Neither this program nor
+its author are associated with Fame Information Services Inc, nor does
+the author guarantee this software in any way.  This license does
+not in any way grant you rights to use the FAME software.  You must
+already have a FAME license which authorizes the use of CHLI.
+
+This software is derived from public domain work done at the
+Board of Governors of the Federal Reserve System, Washington, DC.
+
+This software requires Perl version 5.001m.  A simpler, public domain
+version for perl 4.036 is available from the author or the Federal
+Reserve Board.  This program also requires FAME 7.6 (see FAME 7.5
+section below if you are using that version). 
+
+------------------------------------------------------------------------
+
+INSTALLATION
+------------
+
+1. Set the FAME environment variable.
+
+2. Check Makefile.PL to make sure directories are correct.  If you want
+   to use the FRB extensions add a "-DFRB" to the "DEFINES" section. See
+   DEFINES below for more options.  Making changes to the defines may
+   require manually adding or removing entries to the @EXPORTS array in 
+   file Fame.pm.  Also look at the Makefile.PL file in the LANG, DB, and 
+   HLI directories.
+
+3. Extract the Makefile by running "perl Makefile.PL".
+
+4. Run "make".
+
+5. If everything builds OK, run "make test" to perform rudimentary
+   tests.
+
+   a) IMPORTANT:  If you have problems running the test, particularly if
+      you get an "Illegal Instruction" or "Bus Error" message, then you
+      may have to patch the Perl executable to remove a name ("Errors")
+      which conflicts with the Fame library.  Run "make patchperl" and
+      try "make test" again.  This patch should not affect the 
+      functionality of perl or any extensions.  After you verify that
+      perl works, make sure to copy it to your production directory
+      (such as /usr/local/bin).
+
+      SOLARIS: "Error" does not have a "_" in front of it.  You will have
+      to run "make patchsolaris".
+
+6. To install everything into production, you may run "make install".
+
+
+MAKEFILE DEFINES
+----------------
+
+     FRB        Include FRB extensions.
+     HLILIB     Include $FAME/demo/hli/chlilib.c support which
+                includes various utilities to get text representations
+                for errors, frequencies, etc.
+     HLI75      Include support for new Fame 7.5 functions.
+     UNSUP      Include undocumented and unsupported functions.
+
+
+DOCUMENTATION
+-------------
+
+"Fame.pod" contains the current manual.  There is also a file
+"Paper.doc" which contains an introductory paper about the perl 4
+interface, but not any of the new object-oriented features added to
+the perl 5 interface. "HLI/usage.doc" contains a summary of the HLI
+package functions.
+
+
+FAME 7.5
+--------
+
+To use FAME 7.5 you may have to modify some of the files during the
+make process.  After step 4 ("make"), you will probably get an error
+such as "famecons.i: syntax error at or near word 'extern'."  You will
+have to find the line where the error occurred, which will probably be
+in a "case" statement, and remove it.  Then type "make" again.
+
+
+CONTACT INFO
+------------
+
+This software is being enhanced all the time in order to fix bugs,
+keep up with FAME and perl changes, or add new features.  If you use
+this software, please let the author know, so he can help keep you
+up-to-date.  The author also provides installation assistance,
+classes, and contract programming (please ask for information about
+these services specifically).  Also, the author keeps an older version
+of this software for Tcl which, although fully functional, is not
+being actively maintained.
+
+Fernando Trias 
+<ftrias@helix.fmrco.com>
+132 1/2 Oxford St Apt 6
+Cambridge, MA 02140
+
+
+HLI.PH
+------
+
+hli.ph is obsolete and may not be supported in future releases of this
+software.  It is provided now for compatability with older versions of
+fameperl.
+
+If you wish to maintain hli.ph in a different directory than the
+original perl libraries, you may do one of two things:
+ 
+1) You may wish to modify the perl 5 config.h file.  First, run
+"Configure" and "make depend".  Then, assuming a directory of
+/usr/local/lib/perl for your perl libraries, and
+/usr/local/lib/fameperl for you fameperl specific files such as
+hli.ph.  Modify the line which would read:
+ 
+ #define PRIVLIB "/usr/local/lib/perl5"
+ 
+to read:
+ 
+ #define PRIVLIB "/usr/local/lib/perl5:/usr/local/lib/fameperl"
+ 
+2) You may also use the PERLLIB or PERL5LIB environment variable.
+
+
+MODULES LIST
+------------
+
+Part 2: 7) Database Interfaces (see also Data Types)
+
+Fame           adcO  FAME database and language                   TRIAS
+
+Part 4: 1)   Information / Contact Reference Details
+
+  TRIAS  Fernando Trias <ftrias@helix.fmrco.com>
