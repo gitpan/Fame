@@ -22,7 +22,7 @@ int             fameinit();
 #include "fame.xtra"
 
 int             f_status;
-char            *version="2.00";
+char            *version="2.01";
 
 #include "fame.i"
 
@@ -436,7 +436,7 @@ XS(Fame_fameread)
       break;
     case HUNDFT:
       sz = 0;
-  defalut:  sz = 0;
+    default:  sz = 0;
     }
     if (sz == 0) {
       /* croak("Fame error: Invalid data type"); */
@@ -449,6 +449,7 @@ XS(Fame_fameread)
     if (status != HSUCC) {
       /* fprintf(stderr,"HLI(%d)",status); */
       /* croak("Fame error: Read failed"); */
+      free(valary);
       XSRETURN_UNDEF;
     }
 
@@ -702,6 +703,12 @@ XS(Fame_famewrite)
 
     numobs = items - 4;
     freq = famegetfreq(dbkey, series);
+    if (f_status != HSUCC) {
+      /* croak("Fame error: unsupported data type"); */
+      ST(0)=sv_newmortal();
+      sv_setiv(ST(0), f_status);
+      XSRETURN(1);
+    }
     typ = famegettype(dbkey, series);
     cfmsrng(&status, freq, &year, &prd, &eyear, &eprd, range, &numobs);
     f_status = status;
@@ -722,6 +729,8 @@ XS(Fame_famewrite)
     }
     if (sz == 0) {
       /* croak("Fame error: unsupported data type"); */
+      ST(0)=sv_newmortal();
+      sv_setiv(ST(0), HBOBJT);
       XSRETURN(1);
     }
     valary = (float *) malloc(numobs * sz);
@@ -783,11 +792,11 @@ XS(Fame_famewrite)
     }
     cfmwrng(&status, dbkey, series, range, valary, HNTMIS, mistt);
     f_status = status;
-    if (status != HSUCC) {
+    /*if (status != HSUCC) {*/
       /* fprintf(stderr,"HLI(%d)",status); */
       /* croak("Fame error: Write failed"); */
-      XSRETURN_UNDEF;
-    }
+      /* XSRETURN_UNDEF; */
+    /*}*/
     free(valary);
     ST(0)=sv_newmortal();
     sv_setiv(ST(0), status);

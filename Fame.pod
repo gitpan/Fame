@@ -373,7 +373,9 @@ reference in an array context:
 
 =item @data = &Fame::HLI::fameread($dbkey,$objnam,$syear,$sprd,$eyear,$eprd);
 
-Read data for the given range of dates.
+Read data for the given range of dates.  Returns undef if there's
+a problem (the $Fame::HLI:status variable should be set with the
+error code).
 
 
 =item @data = &Fame::HLI::famereadn($dbkey,$objnam,$numobs,@r,@m);
@@ -393,7 +395,7 @@ translation is being done.
 =item &Fame::HLI::famewrite($dbkey,$objnam,$year,$prd,@list);
 
 Writes out all the elements of @list into the object staring with the
-given date.
+given date.  Returns error status if failed; 0 if sucessful.\n;
 
 =back
 

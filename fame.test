@@ -1,12 +1,37 @@
 #!../../perl
 # FT 9/22/95
 
+
 use Fame;
 
 # change packages to avoid having to write long package names
 # for fxns
 
 package Fame::HLI;
+
+use Config;
+# print "p=",$Config{perlpath}, "\n";
+
+if (-M "patch.log" > -M $Config{perlpath}) {
+    print "Warning:  You may have rebuilt the PERL executable\n";
+    print "          since the last time you patched it.\n";
+    print "$Config{perlpath} is ", -M $Config{perlpath}, " days old\n";
+    print "patch.log is ", -M "patch.log", " days old\n";
+    $patch=1;
+}
+if (! -f "patch.log") {
+    print "Warning:  You have not patched the PERL executable.\n";
+    $patch=1;
+}
+if ($patch) {
+  print "If you continue you may get a segmentation fault.\n";
+  print "See the README file for patching instructions.\n";
+  print "Do you wish to continue? ";
+  $y = <STDIN>;
+  if ($y !~ /^[Yy]/) {
+    die "Run 'make patchperl' or 'make patchsolaris'\n";
+  }
+}
 
 # unbuffered output
 $|=1;
@@ -25,7 +50,7 @@ die "open failed [$Fame::HLI::status]" if $k==-1;
 
 # create a new object
 $name="T1";
-&cfmnwob($status,$k,$name,&HSERIE,&HDAILY,
+&cfmnwob($stat,$k,$name,&HSERIE,&HDAILY,
          &HNUMRC,&HBSDAY,&HOBBEG);
 
 # get the objects information
@@ -38,12 +63,12 @@ eval { $n=&getfrq($d[2]); if ($n eq "") {print "HLILIB error\n"; $errors++;} };
 print "HLILIB extensions not loaded\n" if $@;
 
 # test dates
-&cfmddat($status,&HDAILY,$date,1993,5,2);
-die "DATE FAILED date prob 1" if $status != &HSUCC;
-&cfmdatd($status,&HDAILY,$date,$y,$m,$d);
-die "DATE FAILED date prob 2" if $status != &HSUCC;
-&cfmddat($status,&HDAILY,$date2,$y,$m,$d);
-die "DATE FAILED date prob 3" if $status != &HSUCC;
+&cfmddat($stat,&HDAILY,$date,1993,5,2);
+die "DATE FAILED date prob 1" if $stat != &HSUCC;
+&cfmdatd($stat,&HDAILY,$date,$y,$m,$d);
+die "DATE FAILED date prob 2" if $stat != &HSUCC;
+&cfmddat($stat,&HDAILY,$date2,$y,$m,$d);
+die "DATE FAILED date prob 3" if $stat != &HSUCC;
 die "DATE FAILED date prob 4" if $date2!=$date;
 print "DATE OK\n";
 
@@ -51,13 +76,13 @@ print "DATE OK\n";
 @data=(5,4,3,7,1,2,7,4,3,5,4,6,7,4,2,8,6,4,5,4);
 
 print "writing. . . ";
-$status=&famewrite($k,$name,1990,1,@data);
-if ($status) {
-  print "WRITE FAILED ($status) !!!\n";
+$stat = &famewrite($k,$name,1990,1,@data);
+if ($stat) {
+  print "WRITE FAILED ($stat) !!!\n";
   $errors++;
 }
 # post
-&cfmpodb($status,$k);
+&cfmpodb($stat,$k);
 
 # get the object's information
 @d=&famegetinfo($k,$name);
@@ -78,6 +103,12 @@ if ($flag>0) {
 }
 else {
   print "READ/WRITE OK\n";
+}
+
+$s = &cfmcpob($stat, $k, $k, "abcdefg", "testxyz");
+if ($s==0 || $stat==0 || $stat != $s) {
+  print "ERROR returning correct status\n";
+  $errors++;
 }
 
 # close
@@ -155,5 +186,5 @@ if ($errors) {
 }
 
 print "ALL TESTS OK\n";
-system("rm test.db");
+#system("rm test.db");
 exit(0);

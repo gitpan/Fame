@@ -47,9 +47,10 @@ sub AUTOLOAD {
 
 bootstrap Fame::HLI;
 
-tie $status, Fame::HLI_var_status, "status";
-tie $version, Fame::HLI_var_version, "version";
+tie $status, Fame::HLI::var_status, "status";
+tie $version, Fame::HLI::var_version, "version";
 
+package Fame::HLI;
 # HLI.pm version number
 sub version {2.0;}
 

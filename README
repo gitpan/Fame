@@ -1,11 +1,11 @@
 
-                            Fame Perl Extension
-                            -------------------
+                         Fame Perl Extension 2.0c
+                         ------------------------
 
                               Fernando Trias
 
             Parts of this software are in the public domain.
-            Changes and additions are Copyright 1995, 1996 by 
+            Changes and additions are Copyright 1995-1997 by 
             Fernando Trias. All rights reserved.
 
 ------------------------------------------------------------------------
@@ -50,10 +50,10 @@ INSTALLATION
 
 3. Extract the Makefile by running "perl Makefile.PL".
 
-4. Run "make".
+4. Run "make".  HLI/Makefile.PL uses cppstdin, which perl installs. 
+   If you don't have it, try "cc -E" or "/usr/lib/cpp" instead.
 
-5. If everything builds OK, run "make test" to perform rudimentary
-   tests.
+5. Run "make patchperl" (or "make patchsolaris" for Solaris)
 
    a) IMPORTANT:  If you have problems running the test, particularly if
       you get an "Illegal Instruction" or "Bus Error" message, then you
@@ -67,7 +67,10 @@ INSTALLATION
       SOLARIS: "Error" does not have a "_" in front of it.  You will have
       to run "make patchsolaris".
 
-6. To install everything into production, you may run "make install".
+6. If everything builds OK, run "make test" to perform rudimentary
+   tests.
+
+7. To install everything into production, you may run "make install".
 
 
 MAKEFILE DEFINES

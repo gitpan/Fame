@@ -71,13 +71,13 @@ sub dovarline {
 sub dovar {
 
     print INIT 
-      "newXS(\"${pg}_var_${alias}::TIESCALAR\",
+      "newXS(\"${pg}::var_${alias}::TIESCALAR\",
       ${pfx}_var_${alias}_TIESCALAR,fn);\n";
     print INIT 
-      "newXS(\"${pg}_var_${alias}::FETCH\",
+      "newXS(\"${pg}::var_${alias}::FETCH\",
       ${pfx}_var_${alias}_FETCH,fn);\n";
     print INIT 
-      "newXS(\"${pg}_var_${alias}::STORE\",
+      "newXS(\"${pg}::var_${alias}::STORE\",
       ${pfx}_var_${alias}_STORE,fn);\n";
     # print INIT "\tMAGICVAR(\"$alias\",UV_$alias);\n";
     # print HDR "\tUV_$alias,\n";
