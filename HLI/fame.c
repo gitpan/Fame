@@ -162,6 +162,8 @@ XS(Fame_cfmsatt)
           pf = FNUMND;
         else if (strcmp(ss, "NA") == 0)
           pf = FNUMNA;
+        else
+          pf = (float) SvNV(ST(5));
       } else
         pf = (float) SvNV(ST(5));
       break;
@@ -175,6 +177,8 @@ XS(Fame_cfmsatt)
           memcpy(value, FSTRND, HSMLEN);
         else if (strcmp(ss, "NA") == 0)
           memcpy(value, FSTRNA, HSMLEN);
+        else
+          value = SvPV(ST(5), na);
       } else
         value = SvPV(ST(5), na);
       break;
@@ -187,6 +191,8 @@ XS(Fame_cfmsatt)
           pi = FBOOND;
         else if (strcmp(ss, "NA") == 0)
           pi = FBOONA;
+        else
+          pi = (int) SvIV(ST(5));
       } else
         pi = (int) SvIV(ST(5));
       break;
@@ -199,8 +205,10 @@ XS(Fame_cfmsatt)
           pd = FPRCND;
         else if (strcmp(ss, "NA") == 0)
           pd = FPRCNA;
+        else
+          pd = (double) SvNV(ST(5));
       } else
-        pd = (double) SvNV(ST(6));
+        pd = (double) SvNV(ST(5));
       break;
     }
 
@@ -740,6 +748,8 @@ XS(Fame_famewrite)
             pf[i] = FNUMND;
           else if (strcmp(ss, "NA") == 0)
             pf[i] = FNUMNA;
+          else
+            pf[i] = (float) SvNV(ST(i + 4));
         } else
           pf[i] = (float) SvNV(ST(i + 4));
         break;
@@ -751,6 +761,8 @@ XS(Fame_famewrite)
             pi[i] = FBOOND;
           else if (strcmp(ss, "NA") == 0)
             pi[i] = FBOONA;
+          else
+            pi[i] = (int) SvIV(ST(i + 4));
         } else
           pi[i] = (int) SvIV(ST(i + 4));
         break;
@@ -762,6 +774,8 @@ XS(Fame_famewrite)
             pd[i] = FPRCND;
           else if (strcmp(ss, "NA") == 0)
             pd[i] = FPRCNA;
+          else
+            pd[i] = (double) SvNV(ST(i + 4));
         } else
           pd[i] = (double) SvNV(ST(i + 4));
         break;

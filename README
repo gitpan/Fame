@@ -1,6 +1,6 @@
 
-                            Fameperl 2 alpha 4
-                            ------------------
+                            Fame Perl Extension
+                            -------------------
 
                               Fernando Trias
 
@@ -19,10 +19,6 @@
     license for more details.
 ------------------------------------------------------------------------
 
-THIS IS TEST SOFTWARE AND SHOULD NOT BE REDISTRIBUTED EXCEPT FOR TEST
-PURPOSES.  PLEASE CONTACT THE AUTHOR IF YOU HAVE ANY QUESTIONS,
-PROBLEMS OR COMMENTS.
-
 Fameperl contains FAME extensions for Perl 5.  FAME is a registered
 trademark of FAME Information Services Inc.  Neither this program nor
 its author are associated with Fame Information Services Inc, nor does
@@ -33,7 +29,7 @@ already have a FAME license which authorizes the use of CHLI.
 This software is derived from public domain work done at the
 Board of Governors of the Federal Reserve System, Washington, DC.
 
-This software requires Perl version 5.001m.  A simpler, public domain
+This software requires Perl version 5.002.  A simpler, public domain
 version for perl 4.036 is available from the author or the Federal
 Reserve Board.  This program also requires FAME 7.6 (see FAME 7.5
 section below if you are using that version). 
@@ -46,11 +42,11 @@ INSTALLATION
 1. Set the FAME environment variable.
 
 2. Check Makefile.PL to make sure directories are correct.  If you want
-   to use the FRB extensions add a "-DFRB" to the "DEFINES" section. See
-   DEFINES below for more options.  Making changes to the defines may
-   require manually adding or removing entries to the @EXPORTS array in 
-   file Fame.pm.  Also look at the Makefile.PL file in the LANG, DB, and 
-   HLI directories.
+   to use the FRB extensions available at the Federal Reserve, add a
+   "-DFRB" to the "DEFINES" section. See DEFINES below for more options. 
+   Making changes to the defines may require manually adding or
+   removing entries to the @EXPORTS array in file Fame.pm.  Also look
+   at the Makefile.PL file in the LANG, DB, and HLI directories.
 
 3. Extract the Makefile by running "perl Makefile.PL".
 
@@ -95,7 +91,7 @@ the perl 5 interface. "HLI/usage.doc" contains a summary of the HLI
 package functions.
 
 
-FAME 7.5
+VERSIONS
 --------
 
 To use FAME 7.5 you may have to modify some of the files during the
@@ -103,6 +99,10 @@ make process.  After step 4 ("make"), you will probably get an error
 such as "famecons.i: syntax error at or near word 'extern'."  You will
 have to find the line where the error occurred, which will probably be
 in a "case" statement, and remove it.  Then type "make" again.
+
+This package has been build on SunOS and Solaris with FAME versions 7.0
+to 7.7 with minor changes.  Contact the author for specifics if you
+are having trouble.
 
 
 CONTACT INFO
@@ -118,7 +118,7 @@ of this software for Tcl which, although fully functional, is not
 being actively maintained.
 
 Fernando Trias 
-<ftrias@helix.fmrco.com>
+<ftrias@fmrco.com>
 132 1/2 Oxford St Apt 6
 Cambridge, MA 02140
 
@@ -157,4 +157,4 @@ Fame           adcO  FAME database and language                   TRIAS
 
 Part 4: 1)   Information / Contact Reference Details
 
-  TRIAS  Fernando Trias <ftrias@helix.fmrco.com>
+  TRIAS  Fernando Trias <ftrias@fmrco.com>

@@ -20,6 +20,7 @@ HLI/fame2.c
 HLI/famebad.doc
 HLI/h2c
 HLI/h2i
+HLI/h2ph
 HLI/usage.doc
 LANG/LANG.pm
 LANG/Makefile.PL

@@ -4,26 +4,28 @@ use ExtUtils::MakeMaker;
 
 &WriteMakefile(
                "NAME" => "Fame",
-	       "VERSION" => "2"
+	       "VERSION" => "2.0b"
 		);
 
 sub MY::test {'
 test: fame.test
-	$(PERL_SRC)/perl fame.test
+	$(FULLPERL) fame.test
 
 patchperl:
-	mv $(PERL_SRC)/perl $(PERL_SRC)/perl.old
-	$(PERL_SRC)/perl.old -p -e s/_Error/_ErroX/g $(PERL_SRC)/perl.old \
-	> $(PERL_SRC)/perl
-	chmod +x $(PERL_SRC)/perl
+	mv $(FULLPERL) $(FILLPERL).old
+	$(FULLPERL).old -p -e s/_Error/_ErroX/g $(FULLPERL).old \
+	> $(FULLPERL)
+	chmod +x $(FULLPERL)
 
-patchperl:
-	mv $(PERL_SRC)/perl $(PERL_SRC)/perl.old
-	$(PERL_SRC)/perl.old -p -e s/Error/ErroX/g $(PERL_SRC)/perl.old \
-	> $(PERL_SRC)/perl
-	chmod +x $(PERL_SRC)/perl
+patchsolaris:
+	mv $(FULLPERL) $(FULLPERL).old
+	$(FULLPERL).old -p -e s/Error/ErroX/g $(FULLPERL).old \
+	> $(FULLPERL)
+	chmod +x $(FULLPERL)
 
-maildist:
-	uuencode Fame-2.tar.Z Fame-2.tar.Z >Fame-2.uue
-	split -200 Fame-2.uue Fame-2.
+maildist: dist
+	uncompress Fame-$(VERSION).tar.Z
+	gzip Fame-$(VERSION).tar
+	uuencode Fame-$(VERSION).tar.gz Fame-$(VERSION).tar.gz >Fame-$(VERSION).uue
+	split -200 Fame-$(VERSION).uue Fame-$(VERSION).
 '}

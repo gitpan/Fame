@@ -27,6 +27,7 @@ open(XTRA,">$ARGV[4]") || die "Can't open $ARGV[4]";
 
 &init;
 while(<IN>) {
+  next if /^#/;
   /^CALL|^CASE/ && ( &docall, next );
   /^VAR/ && ( &dovarline, next );
   print XTRA $_;

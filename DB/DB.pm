@@ -202,6 +202,7 @@ sub writestrings {
   if ($freq == &Fame::HLI::HCASEX) {
     $d=$sp;
     foreach $str (@val) {
+      $len = length($str);
       $d++;
       $num=-1;
       &Fame::HLI::cfmsrng($status,$freq,$sy,$d,$sy,$d,$r1,$r2,$r3,$num);
@@ -211,6 +212,7 @@ sub writestrings {
   } else {
     &Fame::HLI::cfmpdat($status, $freq, $d, $sy, $sp);
     foreach $str (@val) {
+      $len = length($str);
       &Fame::HLI::cfmdatp($status, $freq, $d++, $sy, $sp);
       $num=-1;
       &Fame::HLI::cfmsrng($status,$freq,$sy,$sp,$sy,$sp,$r1,$r2,$r3,$num);

@@ -43,6 +43,12 @@ sub command {
  
 sub exec {
   my($self, $cmd, $start, $end)=@_;
+
+  my(@i)=&Fame::HLI::famegetinfo($self->{workdb}, $TEMP);
+  if ($i[0]!=0) {
+    &Fame::HLI::cfmfame($self->{status}, "delete $TEMP");
+  }
+
   $cmd="-/$TEMP=".$cmd;
   &Fame::HLI::cfmfame($self->{status}, $cmd);
   return &Fame::DB::Read($self->{workdb}, $TEMP, $start, $end);

@@ -21,21 +21,15 @@ $FAME="/usr/local/fame" unless $FAME=$ENV{FAME};
 sub MY::postamble {
     '
 hli.ph: $(FAME)/hli/hli.h h2ph
-	$(PERL_SRC)/perl h2ph < $(FAME)/hli/hli.h > hli.ph
+	perl h2ph < $(FAME)/hli/hli.h > hli.ph
 
 famecons.i: $(FAME)/hli/hli.h h2c
-	$(PERL_SRC)/perl h2c $(FAME)/hli/hli.h > famecons.i
+	perl h2c $(FAME)/hli/hli.h > famecons.i
 
 fame.i: fame.cli cliperl
-	/usr/lib/cpp -P $(DEFINE) fame.cli > fame.cli.out
-	$(PERL_SRC)/perl cliperl Fame::HLI Fame fame.cli.out fameperl.h \
+	cppstdin $(DEFINE) < fame.cli > fame.cli.out
+	perl cliperl Fame::HLI Fame fame.cli.out fameperl.h \
 		fame.i fameinit.i fame.xtra fameval.i fameset.i
-
-patchperl:
-	mv $(PERL_SRC)/perl $(PERL_SRC)/perl~
-	$(PERL_SRC)/perl~ -p -e s/_Error/_ErroX/g $(PERL_SRC)/perl~ \
-	> $(PERL_SRC)/perl
-	chmod +x $(PERL_SRC)/perl
 ';
 }
 
