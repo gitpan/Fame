@@ -35,7 +35,7 @@ Fame - Perl5 access to FAME
 
 =item 1.  
 
-All but 6 C HLI 7.5 functions are fully implemented in native perl
+All but 6 C HLI 7.7 functions are fully implemented in native perl
 code.  Not implemented: cfmlsts, cfmrdfa, cfmrrng, cfmrsts, cfmwrng,
 cfmwsts.
 
@@ -456,5 +456,7 @@ and possibly affect this extension.
 =head1 AUTHOR
 
  Fernando Trias
+ trias@ix.netcom.com
+ http://www.netcom.com/~trias
 
 =cut

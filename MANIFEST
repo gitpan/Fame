@@ -5,7 +5,6 @@ HISTORY
 Makefile.PL
 Fame.pm
 Fame.pod
-Paper.doc
 DB/DB.pm
 DB/Makefile.PL
 DB/test.pl

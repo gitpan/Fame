@@ -76,7 +76,7 @@ sub getdate {
   my ($d, $freq, $year, $per)=@_;
   my ($status, $date);
   #print STDERR "ydate $d\n";
-  if ($d eq "" || $d eq "*") { return($year, $per); }
+  if (!$d || $d eq "" || $d eq "*") { return($year, $per); }
   if (!$freq) { $freq=$FREQ; }
   if ($freq==&Fame::HLI::HCASEX) { $d =~ s/^\d+://; return (0, $d); }
   if ($d =~ /:/) {
@@ -86,7 +86,7 @@ sub getdate {
   }
   # extract string ($dd) and +/- offset ($do)
   my ($dd,$do)=($d =~ /^([^+-]+)([+-]\d+)?/);
-  #print STDERR "xdate $d:$dd:$do\n";
+  print STDERR "xdate $d:$dd:$do\n";
   &Fame::HLI::cfmldat($status, $freq, $date, $dd, 
       &Fame::HLI::HJAN, &Fame::HLI::HFYFST, 1900);
   &Fame::HLI::cfmdatp($status, $freq, $date+$do, $year, $per);

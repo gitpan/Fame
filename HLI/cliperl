@@ -12,8 +12,7 @@
 #  val.i     code to get values of variables
 #  set.i     code to set values of variables
 #
-# cliperl is in the public domain.
-# Fernando Trias, Federal Reserve Board
+# Fernando Trias
 #
 
 $pg=shift;
@@ -300,7 +299,8 @@ sub doarg {
         $init.="\tstrncpy($arg,SvPV(ST($count),na),$slen);\n"
       }
       if ($io =~ /O/) {
-        $retx.="\tsv_setpv(ST($count),$arg);\n";
+        $retx.="\tif (!SvREADONLY(ST($count)))\n";
+        $retx.="\t\tsv_setpv(ST($count),$arg);\n";
       }
       if ($io =~ /R/) {
         $retv.="\tST($retvc)=sv_newmortal();\n";
@@ -311,7 +311,8 @@ sub doarg {
       if ( $io =~ /O/ ) {
         $init.="\t$arg = ($type) SvIV(ST($count));\n"
           if $io =~ /I/;
-        $retx.="\tsv_setnv(ST($count), (double) $arg);\n";
+        $retx.="\tif (!SvREADONLY(ST($count)))\n";
+        $retx.="\t\tsv_setnv(ST($count), (double) $arg);\n";
         $arglist.="\$$arg,";
         if ( $io =~ /R/ ) {
           $retv.="\tST($retvc)=sv_newmortal();\n";

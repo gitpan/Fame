@@ -60,3 +60,12 @@ Fame::HLI, Fame::DB.  Added Fame::LANG package.
 7/23/97  Add DATE support to fameread and famewrite (D. Heffernan)
 7/23/97  Restructure fame.c to add STRING support
 7/23/97  Fix $Fame::HLI::status/version core dump!
+
+2.1 11/97
+
+7/28/97  Add STRING support to fameread/write
+7/29/97  Add check for not overwriting read-only values
+         This means you can pass constants for input/output variables
+9/25/97  Add dual K&C and ANSI C prototypes so that program can
+         compile on CC, gcc, cc and Visual C++.
+11/1/97  Add Windows NT support

@@ -1,4 +1,5 @@
 #!../../../perl
+# Copyright (c) 1996-1997 by Fernando Trias
 
 use ExtUtils::MakeMaker;
 use Config;
@@ -20,12 +21,14 @@ else { $LIBS = ["-L$FAME/hli -lchli"]; }
                "LIBS" => ["-L$FAME/hli -lchli"],
                #"dynamic_lib" => {"OTHERLDFLAGS" => "-Bsymbolic"},
                "OBJECT" => "fame2.o fame.o",
-               "DEFINE" => "-DHLI75 -DHLILIB",
-               "H" => ["fame.i","famecons.i"],
-               "INC" => '-I$(FAME)/hli -I$(FAME)/demo/hli',
+               #"DEFINE" => "-DHLI75 -DHLI76 -DHLILIB -DEXPIRE=19971231",
+               #"DEFINE" => "-DHLI75 -DHLI76 -DHLILIB -DADJDIV",
+               "DEFINE" => "-DHLI75 -DHLI76 -DHLILIB",
+               "H" => ["fame.i","famecons.i","perldef.h"],
+               "INC" => '-I$(FAME)/hli -I$(FAME)/demo/hli -I$(FAME)/sutil',
                "PM" => { 'hli.ph'  => '$(INST_LIBDIR)/hli.ph',
                        'HLI.pm'  => '$(INST_LIBDIR)/HLI.pm' },
-	       "VERSION" => "2"
+	       "VERSION" => "2.1"
 		);
 
 sub MY::postamble {

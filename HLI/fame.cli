@@ -1,10 +1,7 @@
-/* FAME 7.5 definitions */
+/* FAME 7.7 definitions
 
-/*
-     Derived from original public domain version.
-     Changes Copyright (c) 1995 Fernando Trias.  All rights reserved.
-     This program is free software; you can modify it or redistribute
-     it under the same terms as Perl itself.
+Copyright (c) 1995-1997 Fernando Trias.  All rights reserved.
+
 */
 
 /* define FRB if you are using famedbpath */
@@ -29,6 +26,7 @@ defines are
 
    UNSUP  : Undocumented feature
    HLI75  : New to HLI 7.5
+   HLI76  : New to HLI 7.6
    FRB    : FRB-specific function libraries
 */
 
@@ -223,6 +221,69 @@ IO string objnam
 O string aliass
 END
 
+#ifdef HLI76
+CALL void cfmgtali
+RO int status
+I int dbkey
+IO string objnam
+O string alias
+I int inlen
+O int outlen
+END
+
+CALL void cfmgtaso
+RO int status
+I int dbkey
+IO string objnam
+O string assoc
+I int inlen
+O int outlen
+END
+
+CALL void cfmgtatt
+RO int status
+I int dbkey
+IO string objnam
+IO int atttyp
+IO string attnam
+O string value
+I int inlen
+O int outlen
+END
+
+CALL void cfmgtstr
+RO int status
+I int dbkey
+IO string objnam
+I int range 3
+O string strval
+O int ismiss
+I int inlen
+O int outlen
+END
+
+CALL void cfmgtsts
+RO int status
+I int dbkey
+IO string objnam
+I int range 3
+O string strary 2 /* array */
+O int misary
+I int inlen 2 /* array */
+O int outlen 2 /* array */
+END
+
+CALL void cfmgtnl
+RO int status
+I int dbkey
+IO string objnam
+I int index
+O string strval
+I int inlen
+O int outlen
+END
+#endif
+
 #ifdef HLI75
 CALL void cfmgaso
 RO int status
@@ -298,8 +359,9 @@ I int flabel
 I int centry
 END
 
-CALL void cfmini
-RRO int status 
+/* call the expiring version check */
+CALL void d_cfmini cfmini
+RO int status 
 END
 
 CALL void cfminwc
@@ -629,7 +691,7 @@ IO string objnam
 O  int range 3
 O  float valary
 I  int tmistt
-O  float mistt
+O  float mistt 2
 END 
 
 CALL void cfmrsdb
@@ -859,7 +921,7 @@ RO int status
 I  int dbkey
 IO string objnam
 O  int range 3
-O  float valary
+O  float valary 2
 I  int tmiss
 O  float mistt
 END 
@@ -1001,6 +1063,7 @@ I string dbname
 END
 
 #endif
+
 
 CALL int famegettype
 I int dbkey

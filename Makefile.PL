@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 &WriteMakefile(
                "NAME" => "Fame",
-	       "VERSION" => "2.0d"
+	       "VERSION" => "2.1"
 		);
 
 sub MY::postamble {'
@@ -27,4 +27,9 @@ maildist: dist
 	gzip Fame-$(VERSION).tar
 	uuencode Fame-$(VERSION).tar.gz Fame-$(VERSION).tar.gz >Fame-$(VERSION).uue
 	split -200 Fame-$(VERSION).uue Fame-$(VERSION).
+
+alldist:
+	rm -f Fame-src.tar.gz
+	tar cf Fame-src.tar *
+	gzip Fame-src.tar
 '}

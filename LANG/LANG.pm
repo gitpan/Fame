@@ -20,14 +20,14 @@
 
 package Fame::LANG;
  
-# global temporary variable name
-$TEMP = "temp_$$";
- 
 sub new {
   my($key,$status);
   &Fame::HLI::cfmopwk($status, $key);
-  if ($status != &Fame::HLI::HSUCC) { return undef; }
-  return bless { "workdb" => $key, "status" => $status };
+  if ($status != &Fame::HLI::HSUCC) {
+    $Fame::HLI::status = $status;
+    return undef;
+  }
+  return bless { "temp" => "tmp$$", "workdb" => $key, "status" => $status };
 }
 
 sub destroy {
@@ -44,15 +44,15 @@ sub command {
 sub exec {
   my($self, $cmd, $start, $end)=@_;
 
-  my(@i)=&Fame::HLI::famegetinfo($self->{workdb}, $TEMP);
+  my(@i)=&Fame::HLI::famegetinfo($self->{workdb}, $self->{temp});
   if ($i[0]!=0) {
-    &Fame::HLI::cfmfame($self->{status}, "delete $TEMP");
+    &Fame::HLI::cfmfame($self->{status}, "delete work'".$self->{temp});
   }
 
-  $cmd="-/$TEMP=".$cmd;
+  $cmd="-/".$self->{temp}."=".$cmd;
   &Fame::HLI::cfmfame($self->{status}, $cmd);
   return undef if ($self->{status} != Fame::HLI::HSUCC);
-  return &Fame::DB::Read($self->{workdb}, $TEMP, $start, $end);
+  return &Fame::DB::Read($self->{workdb}, $self->{temp}, $start, $end);
 }
  
 sub inp {
@@ -71,3 +71,5 @@ sub inp {
   }
   return 1;
 }
+
+1;

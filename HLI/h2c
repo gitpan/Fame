@@ -13,9 +13,13 @@ while(<>) {
 
 print <<EOF;
 static double
+#ifdef HAS_PROTOTYPE
+constant(WIN32PREFIX char *name, int arg)
+#else
 constant(name, arg)
 char *name;
 int arg;
+#endif
 {
     errno = 0;
     switch (*name) {

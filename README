@@ -1,25 +1,14 @@
 
-                         Fame Perl Extension 2.0d
+                         Fame Perl Extension 2.1
                          ------------------------
 
                               Fernando Trias
 
-                             ftrias@fmrco.com
+                            trias@ix.netcom.com
                        http://www.netcom.com/~trias
 
-            Parts of this software are in the public domain.
-            Changes and additions are Copyright 1995-1997 by 
-            Fernando Trias. All rights reserved.
+       Copyright 1995-1997 by Fernando Trias. All rights reserved.
 
-------------------------------------------------------------------------
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU license or the Artistic
-    License, a copy of which can be found with the perl distribution.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    license for more details.
 ------------------------------------------------------------------------
 
 Fameperl contains FAME extensions for Perl 5.  FAME is a registered
@@ -29,14 +18,11 @@ the author guarantee this software in any way.  This license does
 not in any way grant you rights to use the FAME software.  You must
 already have a FAME license which authorizes the use of CHLI.
 
-This software is derived from public domain work done at the
-Board of Governors of the Federal Reserve System, Washington, DC.
-
-This software requires Perl version 5.002 or above.  A simpler, public
-domain version for perl 4.036 is available from the author or the
-Federal Reserve Board.  This program also requires FAME 7.6 (see
-FAME 7.5 section below if you are using that version).  An extension to
-TCL is also available.
+This software requires Perl version 5.003 or above.  A simpler, public
+domain version for perl 4.036 is available from the author This program
+also requires FAME 7.6 (see FAME 7.5 section below if you are using
+that version).  Extension for TCL and Java (Netscape and Internet
+Explorer) are also available from the author.
 
 ------------------------------------------------------------------------
 
@@ -56,20 +42,23 @@ INSTALLATION
 
 4. Run "make".
 
+5. If everything builds OK, run "make test" to perform rudimentary
+   tests.
+
    a) IMPORTANT:  If you have problems running the test, particularly if
       you get an "Illegal Instruction" or "Bus Error" message, then you
       may have to patch the Perl executable to remove a name ("Errors")
       which conflicts with the Fame library.  Run "make patchperl" and
       try "make test" again.  This patch should not affect the 
-      functionality of perl or any extensions.  After you verify that
-      perl works, make sure to copy it to your production directory
-      (such as /usr/local/bin).
+      functionality of perl or any extensions.
 
       SOLARIS: "Error" does not have a "_" in front of it.  You will have
       to run "make patchsolaris".
 
-5. If everything builds OK, run "make test" to perform rudimentary
-   tests.
+   b) If you still have problems, you may be patching the wrong perl
+      executable.  Make sure that both the installed perl and the one
+      in the "build" directory are the patched version by looking at
+      the time/date of the files.
 
 6. To install everything into production, you may run "make install".
 
@@ -81,6 +70,7 @@ MAKEFILE DEFINES
                 includes various utilities to get text representations
                 for errors, frequencies, etc.
      HLI75      Include support for new Fame 7.5 functions.
+     HLI76      Include support for new Fame 7.6 functions.
      UNSUP      Include undocumented and unsupported functions.
 
 
@@ -126,9 +116,9 @@ these services specifically).  Also, the author keeps an older version
 of this software for TCL.
 
 Fernando Trias 
-<ftrias@fmrco.com>
-132 1/2 Oxford St Apt 6
-Cambridge, MA 02140
+<trias@ix.netcom.com>
+5 Edwards St Apt 1
+Quincy, MA 02169
 http://www.netcom.com/~trias
 
 
@@ -162,8 +152,8 @@ MODULES LIST
 
 Part 2: 7) Database Interfaces (see also Data Types)
 
-Fame           adcO  FAME database and language                   TRIAS
+Fame           bdcO  FAME database and language                   TRIAS
 
 Part 4: 1)   Information / Contact Reference Details
 
-  TRIAS  Fernando Trias <ftrias@fmrco.com>
+  TRIAS  Fernando Trias <trias@ix.netcom.com>

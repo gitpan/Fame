@@ -1,6 +1,6 @@
 # Fame/HLI.pm
 #
-# FT 9/95
+# Copyright 1995-1997 by Fernando Trias
 #
 
 package Fame::HLI;
@@ -9,7 +9,7 @@ use strict;
 use Carp;
 use Exporter;
 use DynaLoader;
-@Fame::HLI::ISA = qw(Exporter, DynaLoader);
+@Fame::HLI::ISA = qw(Exporter DynaLoader);
 
 @Fame::HLI::EXPORT = 
 qw( cfmgatt cfmsatt famestart famestop fameopen fameclose fameread
@@ -57,6 +57,6 @@ tie $Fame::HLI::version, "Fame::HLI::var_version", "version";
 
 package Fame::HLI;
 # HLI.pm version number
-sub version {2.0;}
+sub version {2.1;}
 
 1;

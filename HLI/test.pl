@@ -24,18 +24,12 @@ print "Fame::HLI....ok\n";
 $k=&fameopen("test.db",&HCMODE);
 die "open failed [$Fame::HLI::status]" if $k==-1;
 
-# create a new object
-$name="T1";
-&cfmnwob($stat,$k,$name,&HSERIE,&HDAILY,
-         &HNUMRC,&HBSDAY,&HOBBEG);
+$f = &HDAILY;
 
-# get the objects information
-@d=&famegetinfo($k,$name);
-
-eval { $n=&hli_freq($d[2]); if ($n eq "") {print "FRB error\n"; $errors++;} };
+eval { $n=&hli_freq($f); if ($n eq "") {print "FRB error\n"; $errors++;} };
 print "FRB extensions not loaded--not a problem\n" if $@;
 
-eval { $n=&getfrq($d[2]); if ($n eq "") {print "HLILIB error\n"; $errors++;} };
+eval { $n=&getfrq($f); if ($n eq "") {print "HLILIB error\n"; $errors++;} };
 print "HLILIB extensions not loaded--not a problem\n" if $@;
 
 print "dates......";
@@ -49,10 +43,22 @@ die "DATE FAILED date prob 3" if $stat != &HSUCC;
 die "DATE FAILED date prob 4" if $date2!=$date;
 print "ok\n";
 
+#
+# WRITING NUMERIC
+#
+
+# create a new object
+$name="t1";
+&cfmnwob($stat,$k,$name,&HSERIE,&HDAILY,
+         &HNUMRC,&HBSDAY,&HOBBEG);
+
+# get the object's information
+@d=&famegetinfo($k,$name);
+
 # write some data to the new object
 @data=(5,4,3,7,1,2,7,4,3,5,4,6,7,4,2,8,6,4,5,4);
 
-print "writing....";
+print "writing numeric series....";
 $stat = &famewrite($k,$name,1990,1,@data);
 if ($stat) {
   print "WRITE FAILED ($stat) !!!\n";
@@ -69,10 +75,9 @@ print "ok\n";
 # read that data back
 print "reading....";
 @l=&fameread($k,$name,$d[5],$d[6],$d[7],$d[8]);
-$x=join(" ",@l);
 
 $flag=0;
-foreach $x (0..$#i-1) {
+foreach $x (0..$#data) {
   $flag++ if $data[$x] != $l[$x];
 }
 if ($flag>0) {
@@ -82,6 +87,48 @@ if ($flag>0) {
 else {
   print "ok\n";
 }
+
+#
+# WRITING STRINGS
+#
+
+# create a new object
+$name="t2";
+&cfmnwob($stat,$k,$name,&HSERIE,&HDAILY,
+         &HSTRNG,&HBSDAY,&HOBBEG);
+
+@data=("One", "Two", "Three");
+print "writing string series....";
+$stat = &famewrite($k,$name,1990,1,@data);
+if ($stat) {
+  print "WRITE FAILED ($stat) !!!\n";
+  $errors++;
+}
+# post
+&cfmpodb($stat,$k);
+print "ok\n";
+
+@d=&famegetinfo($k,$name);
+print "reading.....";
+@l=&fameread($k,$name,$d[5],$d[6],$d[7],$d[8]);
+
+$flag=0;
+foreach $x (0..$#data) {
+  $flag++ if $data[$x] ne $l[$x];
+  #print "$data[$x]:$l[$x]:\n";
+}
+
+if ($flag>0) {
+  print "READ/WRITE STRING FAILED for $flag items [$status]!\n";
+  $errors++;
+}
+else {
+  print "ok\n";
+}
+
+#
+# status code
+#
 
 print "status codes.....";
 $s = &cfmcpob($stat, $k, $k, "abcdefg", "testxyz");
@@ -147,15 +194,20 @@ if ($x->{status} != &Fame::HLI::HSUCC) {
   print "FAILED to open new object\n";
   $errors++;
 }
+if ($x->command("open test")->{status} != &Fame::HLI::HSUCC) {
+  print "FAILED command() for open\n";
+  $errors++;
+}
 if ($x->command("x=15")->{status} != &Fame::HLI::HSUCC) {
-  print "FAILED command()\n";
+  print "FAILED command() for x=15\n";
   $errors++;
 }
 ($v)=$x->exec("x");
 if ($v != 15) {
-  print "FAILED exec()!\n";
+  print "FAILED exec() [v=$v]!\n";
   $errors++;
 } else { print "ok\n"; }
+$x->command("close all");
 $x->destroy;
 
 #
